@@ -10,6 +10,7 @@ import { AppModule } from '../src/app.module.js';
 import { configureApp } from '../src/configure-app.js';
 import { validateEnvironment } from '../src/config/environment.js';
 import { PrismaService } from '../src/prisma/prisma.service.js';
+import { authTestEnvironment, testPassword } from './auth-fixture.js';
 
 class ValidationProbeDto {
   @IsString()
@@ -31,6 +32,8 @@ class ValidationProbeController {
 
 describe('API configuration and health (e2e)', () => {
   let app: INestApplication<App>;
+  let cookie: string;
+  let csrfToken: string;
 
   beforeAll(async () => {
     const module = await Test.createTestingModule({
@@ -43,6 +46,7 @@ describe('API configuration and health (e2e)', () => {
       .useValue(
         new ConfigService(
           validateEnvironment({
+            ...authTestEnvironment,
             NODE_ENV: 'test',
             DATABASE_URL: 'postgresql://database.example.invalid/finance',
             CORS_ORIGINS: 'http://localhost:5173,https://frontend.example',
@@ -53,6 +57,23 @@ describe('API configuration and health (e2e)', () => {
     app = module.createNestApplication();
     configureApp(app);
     await app.init();
+    const bootstrap = await request(app.getHttpServer()).get(
+      '/api/auth/session',
+    );
+    const initialCookie = (
+      bootstrap.headers['set-cookie'] as unknown as string[]
+    )[0].split(';')[0];
+    const login = await request(app.getHttpServer())
+      .post('/api/auth/login')
+      .set('Origin', 'http://localhost:5173')
+      .set('Cookie', initialCookie)
+      .set('X-CSRF-Token', bootstrap.body.csrfToken as string)
+      .send({ password: testPassword })
+      .expect(200);
+    cookie = (login.headers['set-cookie'] as unknown as string[])[0].split(
+      ';',
+    )[0];
+    csrfToken = login.body.csrfToken as string;
   });
 
   afterAll(async () => {
@@ -105,6 +126,9 @@ describe('API configuration and health (e2e)', () => {
   it('transforms a valid body into its decorated DTO', async () => {
     await request(app.getHttpServer())
       .post('/api/validation-probe')
+      .set('Cookie', cookie)
+      .set('Origin', 'http://localhost:5173')
+      .set('X-CSRF-Token', csrfToken)
       .send({ title: 'example' })
       .expect(201)
       .expect({ title: 'example', transformed: true });
@@ -113,6 +137,9 @@ describe('API configuration and health (e2e)', () => {
   it('rejects unexpected request properties', async () => {
     const response = await request(app.getHttpServer())
       .post('/api/validation-probe')
+      .set('Cookie', cookie)
+      .set('Origin', 'http://localhost:5173')
+      .set('X-CSRF-Token', csrfToken)
       .send({ title: 'example', unexpected: true })
       .expect(400);
     expect(response.body.message).toContain(
@@ -123,6 +150,9 @@ describe('API configuration and health (e2e)', () => {
   it('rejects invalid DTO field values', async () => {
     await request(app.getHttpServer())
       .post('/api/validation-probe')
+      .set('Cookie', cookie)
+      .set('Origin', 'http://localhost:5173')
+      .set('X-CSRF-Token', csrfToken)
       .send({ title: 123 })
       .expect(400);
   });

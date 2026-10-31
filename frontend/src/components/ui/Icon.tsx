@@ -1,6 +1,9 @@
 import type { ReactNode, SVGProps } from 'react'
 
 const paths = {
+  lock: <><rect x="5" y="10" width="14" height="12" rx="2" /><path d="M8 10V6a4 4 0 0 1 8 0v4m-4 5v3" /></>,
+  key: <><circle cx="7" cy="8" r="5" /><path d="m11 12 10 10m-5-5 3-3m-6 0 3-3" /></>,
+  eye: <><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></>,
   person: <><circle cx="12" cy="7" r="4" /><path d="M4 22v-3a8 8 0 0 1 16 0v3Z" /></>,
   people: <><circle cx="9" cy="7" r="3.5" /><path d="M2 21v-3a7 7 0 0 1 14 0v3ZM17 4a3.5 3.5 0 0 1 0 7m1 3a6 6 0 0 1 4 6" /></>,
   store: <><path d="M4 10v11h16V10M2 7l3-5h14l3 5v3a3 3 0 0 1-5 1 3 3 0 0 1-5 0 3 3 0 0 1-5 0 3 3 0 0 1-5-1ZM9 21v-7h6v7M2 7h20" /></>,

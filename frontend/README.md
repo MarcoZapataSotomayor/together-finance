@@ -1,6 +1,6 @@
 ﻿# Together Finance frontend
 
-React, TypeScript, Vite, and Tailwind CSS v4. The current entry screen is a responsive **Nuevo consumo** visual prototype based on the four images in `docs/design-references`.
+React, TypeScript, Vite, and Tailwind CSS v4. A themed shared-password login protects the responsive **Nuevo consumo** visual prototype based on the four images in `docs/design-references`. Authentication uses the backend; financial inputs remain a local prototype.
 
 ## Commands
 
@@ -10,14 +10,18 @@ Run from `frontend`:
 npm run dev
 npm run lint
 npm run build
-node --test tests/expenseModel.test.mjs
+node --test tests/*.test.mjs
 ```
 
 The model tests use Node's built-in test runner and TypeScript support (verified with Node 24); no test dependencies were added.
 
+Start the backend with its authentication keys configured as described in [authentication.md](../docs/authentication.md). Vite proxies `/api` to `http://localhost:3000`. Optional `VITE_API_URL` contains only the public API base URL including `/api`; see `.env.example`. Vite's proxy is development-only. Production requires a same-origin reverse proxy or an explicit API URL with the documented CORS/cookie configuration.
+
 ## Structure
 
 - `src/theme/`: the existing POV provider, hook, storage validation, theme metadata, and semantic CSS tokens. The provider is preserved; it applies `data-theme` to `<html>` and safely stores only the POV preference.
+- `src/auth/`: auth provider/hook, bounded API client, themed login, logout action, and gate that unmounts private content when access ends. Session/CSRF state stays in React memory; the opaque session cookie is HttpOnly.
+- `src/styles/auth.css`: scoped login styling using the existing theme tokens and ornaments.
 - `src/components/AppShell.tsx`: prototype masthead, themed POV strip, background city silhouette, main content, and footer.
 - `src/components/PovSelector.tsx`: reusable native radio selector for Antonella / Compartido / Marco.
 - `src/components/ui/`: existing Button, Card, Badge, and Icon; new TextField, SelectField, and SegmentedControl primitives with labels, errors, native semantics, and keyboard focus.
@@ -30,7 +34,7 @@ The model tests use Node's built-in test runner and TypeScript support (verified
 - `src/assets/fonts/`: locally bundled licensed heading fonts. Lobster Two adds the connected script seen in the references; Barlow Condensed supplies the comic titles and graphic save actions.
 - `tests/expenseModel.test.mjs`: seven behavior tests for amount parsing, dates, explicit financial roles, conditional card validation, and exact-cent allocations.
 
-The earlier showcase files remain available in `src/features/design-system`; the application entry now renders Nuevo consumo. See [DESIGN.md](../DESIGN.md) for the current visual contract.
+The earlier showcase files remain available in `src/features/design-system`; authenticated access renders Nuevo consumo. See [DESIGN.md](../DESIGN.md) for the current visual contract.
 
 ## Prototype behavior
 
@@ -40,11 +44,15 @@ Amounts accept a decimal dot or comma with up to two decimal places. Calculation
 
 Changing payment method clears the card type and fund provider so an earlier selection is not silently reused as a different payment role. Changing POV only changes the presentation and reference field order. It preserves all entered values, payer, owner, and allocation.
 
-The add-method button creates an option only in React state. Save validates and shows a demo confirmation; it never writes an expense, calls an API, or stores financial data. Reload resets the form and added payment methods. Only `together-finance:pov` survives reload. Invalid or unavailable browser storage falls back to Shared without preventing in-session switching.
+The add-method button creates an option only in React state. Save validates and shows a demo confirmation; it never writes an expense, calls an API, or stores financial data. Reload resets the form and added payment methods. Only `together-finance:pov` uses localStorage; authentication survives reload through its separate HttpOnly cookie. Invalid or unavailable browser storage falls back to Shared without preventing in-session switching.
 
 POV is never authentication, proof of identity, financial ownership, or a payer default.
 
+Session restoration tries a safe GET at most twice with a 30-second timeout per attempt and a one-second gap. After three seconds, the screen explains that the server may be waking. Exhaustion offers a manual reconnect action; password submissions and logout are never automatically retried. Login confirms the rotated cookie with a session GET before displaying private content. Expiration and successful logout unmount the expense form, clearing its in-memory values without changing POV.
+
 ## Manual test checklist
+
+Before the financial checks, test an incorrect password, then sign in, refresh, and sign out. Switch POV before login and verify it survives both operations. Inspect keyboard focus, password visibility toggle, server-unavailable reconnect, and slow-server messaging. No authentication keys should appear in browser storage. For production, test cookie acceptance in the target browsers with the actual deployment origins.
 
 1. At 320, 375, 390, 768 px and desktop width, switch all three themes. Check horizontal scrolling, visible fields, focus outlines, and decorative clearance. Try a physical phone as well as browser emulation.
 2. Submit the empty form. Check the focused error summary and field messages; correct each required field.
@@ -58,5 +66,7 @@ POV is never authentication, proof of identity, financial ownership, or a payer 
 ## Validation performed
 
 Lint, build, and all seven model tests pass. Isolated headless Edge checks covered all three themes at the five required widths, including expanded custom percentages, error messages, and the add-method panel. Checks also covered explicit financial selections, valid and invalid submissions, session-only methods, keyboard flow, POV persistence, blocked storage, and absence of runtime errors. Relevant field and action token pairs, including gradient endpoints, exceed 4.5:1 contrast. A reference comparison review confirmed the listed visual corrections were resolved.
+
+Authentication adds six passing API-client tests (13 frontend tests total). Headless Edge checks also covered the login in all three themes at 320, 375, 390, 768, and 1440 px, keyboard submission, wrong-password errors, refresh restoration, logout and network failure, cookie blocking, server waking, bounded retries, and expiration. The financial form and theme source files remain unchanged. Actual mobile hardware and production browser cookie policies still need deployment testing.
 
 The prototype uses simplified vector ornaments and lighter texture than the rendered references. It does not reproduce their photographic material detail or decorative phone hardware. Desktop uses a deliberate two-column form with an allocation preview rather than enlarging the portrait reference unchanged.
