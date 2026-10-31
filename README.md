@@ -11,6 +11,7 @@ Use Node.js 24.x and npm (verified with Node 24.18.0 and npm 11.16.0). The front
 - `docs/design-references/`: approved visual references.
 - `docs/database-design.md`: relational model, money/debt rules, transactions, migrations, and restoration policy.
 - `docs/authentication.md`: shared-password setup, sessions, CSRF, tests, and deployment limits.
+- `docs/ci-cd.md`: GitHub Actions CI, local reproduction, and future delivery concepts.
 
 ## Start the frontend
 
@@ -101,6 +102,10 @@ npm audit --omit=dev
 The NestJS 12 scaffold uses type-aware Oxlint and Vitest. The end-to-end validation probe exists only in the test application, not in the real API.
 
 The reviewed initial migration is `20261031170000_initial_financial_schema`. It was applied to an inspected empty database without seed data. Existing installations use `npm run prisma:migrate:status`; new installations must follow the inspection/review procedure in [database design](docs/database-design.md) before `npm run prisma:migrate:deploy`. Never reset the existing database. Build and development startup generate Prisma Client automatically.
+
+## Continuous integration
+
+GitHub Actions runs independent **Frontend** and **Backend** CI jobs for PRs targeting `develop`/`main` and pushes to those branches. Both use Node 24, locked npm installs, lint, tests, and production builds; the backend also generates and validates Prisma without database credentials. This workflow does not deploy or run migrations. See [CI/CD documentation](docs/ci-cd.md) for the commands, cache behavior, security boundaries, and how to inspect runs.
 
 ## Hosting preparation
 
