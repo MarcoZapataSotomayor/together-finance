@@ -1,0 +1,174 @@
+@font-face {
+  font-family: 'Lobster Two';
+  src: url('../assets/fonts/lobster-two-700-italic-latin.woff2') format('woff2');
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Caveat';
+  src: url('../assets/fonts/caveat-600-latin.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Barlow Condensed';
+  src: url('../assets/fonts/barlow-condensed-700-latin.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root,
+[data-theme='shared'] {
+  color-scheme: light;
+  --background: #a8cedd;
+  --surface: #fff5e9;
+  --surface-alt: #efeee7;
+  --text: #30212b;
+  --muted-text: #715664;
+  --primary: #92344e;
+  --primary-foreground: #fffefa;
+  --primary-soft: #e4ece3;
+  --secondary: #efcfd9;
+  --pink: #f2dbe2;
+  --blue: #dce7f0;
+  --mint: #deebdd;
+  --yellow: #f4edce;
+  --red: #a94e4b;
+  --border: #775260;
+  --control-border: #895d70;
+  --focus: #396486;
+  --shadow: 0 5px 22px rgb(45 59 49 / 4%);
+  --card-radius: 22px;
+  --button-radius: 12px;
+  --border-width: 1px;
+  --heading-font: 'Lobster Two', 'Segoe Script', cursive;
+  --heading-weight: 700;
+  --section-font: 'Segoe UI', system-ui, sans-serif;
+  --signature-font: 'Caveat', cursive;
+  --success: #365738;
+  --success-surface: #e0ebdf;
+  --warning: #73531b;
+  --warning-surface: #f7edcf;
+  --info: #354e6c;
+  --info-surface: #e2ebf5;
+  --frame-edge: #a87976;
+  --frame-highlight: #fffcf1;
+  --paper: #fff4e7;
+  --input-surface: #fff8f5;
+  --input-border: #8d6476;
+  --selection: #f3a4bd;
+  --selection-end: #f9cad6;
+  --selection-ink: #691d36;
+  --save-surface: #b4d2ba;
+  --save-end: #d6e8d5;
+  --save-ink: #283e30;
+  --danger: #9b2e3f;
+  --field-label-size: .95rem;
+  --panel-gold: #bb8744;
+}
+
+[data-theme='antonella'] {
+  --background: #f6ced7;
+  --surface: #fff5e9;
+  --surface-alt: #faefee;
+  --text: #563e46;
+  --muted-text: #795c66;
+  --primary: #974561;
+  --primary-foreground: #fffdf9;
+  --primary-soft: #f9e4eb;
+  --secondary: #f0c5d3;
+  --pink: #f6dce5;
+  --blue: #e2ebf4;
+  --mint: #e1eddf;
+  --yellow: #faf0cb;
+  --red: #a0475d;
+  --border: #bb889a;
+  --control-border: #a36b82;
+  --focus: #984261;
+  --shadow: 0 6px 24px rgb(129 67 84 / 6%);
+  --card-radius: 28px;
+  --button-radius: 24px;
+  --border-width: 1px;
+  --heading-font: 'Lobster Two', 'Segoe Script', cursive;
+  --heading-weight: 700;
+  --section-font: 'Segoe UI', system-ui, sans-serif;
+  --signature-font: 'Caveat', cursive;
+  --success: #3d6041;
+  --success-surface: #e4efdf;
+  --warning: #795520;
+  --warning-surface: #fbefcc;
+  --info: #6c4c74;
+  --info-surface: #f1e6f2;
+  --frame-edge: #b8908e;
+  --paper: #fff4e7;
+  --input-border: #a36b82;
+  --selection: #f2a1bd;
+  --selection-end: #ffd4de;
+  --selection-ink: #76253e;
+}
+
+[data-theme='marco'] {
+  --background: #8cb4c9;
+  --surface: #f8f0e3;
+  --surface-alt: #e9eee9;
+  --text: #1d2331;
+  --muted-text: #535d61;
+  --primary: #a62e3b;
+  --primary-foreground: #fffdf4;
+  --primary-soft: #f5e1d9;
+  --secondary: #c5ddea;
+  --pink: #ebd6d4;
+  --blue: #c5ddea;
+  --mint: #dfe8db;
+  --yellow: #f2e9bf;
+  --red: #a2443f;
+  --border: #202632;
+  --control-border: #202632;
+  --focus: #235b88;
+  --shadow: 0 5px 16px rgb(40 55 64 / 6%);
+  --card-radius: 12px;
+  --button-radius: 7px;
+  --border-width: 2px;
+  --heading-font: 'Barlow Condensed', Impact, sans-serif;
+  --heading-weight: 700;
+  --section-font: 'Barlow Condensed', Impact, sans-serif;
+  --signature-font: 'Barlow Condensed', Impact, sans-serif;
+  --success: #33563b;
+  --success-surface: #e0e9d9;
+  --warning: #71541c;
+  --warning-surface: #f4eac7;
+  --info: #2b4f69;
+  --info-surface: #dceaf2;
+  --frame-edge: #202632;
+  --paper: #f8f0e3;
+  --input-surface: #f8f1e9;
+  --input-border: #242837;
+  --selection: #aa303e;
+  --selection-end: #ba414e;
+  --selection-ink: #fff8ed;
+  --save-surface: #a92e3c;
+  --save-end: #ba414e;
+  --save-ink: #fff8ed;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-alt: var(--surface-alt);
+  --color-foreground: var(--text);
+  --color-muted: var(--muted-text);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-soft: var(--primary-soft);
+  --color-border: var(--border);
+  --color-focus: var(--focus);
+  --font-heading: var(--heading-font);
+  --shadow-card: var(--shadow);
+  --radius-card: var(--card-radius);
+  --radius-button: var(--button-radius);
+}
