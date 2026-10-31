@@ -1,7 +1,10 @@
+import { runtimeDatabaseUrl } from './database-urls.js';
+
 export interface EnvironmentConfig {
   NODE_ENV: 'development' | 'test' | 'production';
   PORT: number;
   CORS_ORIGINS: string[];
+  DATABASE_URL: string;
 }
 
 const localOrigins = 'http://localhost:5173,http://127.0.0.1:5173';
@@ -63,5 +66,10 @@ export function validateEnvironment(
     }
   });
 
-  return { NODE_ENV: nodeEnv, PORT: port, CORS_ORIGINS: [...new Set(origins)] };
+  return {
+    NODE_ENV: nodeEnv,
+    PORT: port,
+    CORS_ORIGINS: [...new Set(origins)],
+    DATABASE_URL: runtimeDatabaseUrl(input),
+  };
 }

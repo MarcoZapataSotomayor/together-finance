@@ -1,11 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { validateEnvironment } from './environment.js';
+import { validateEnvironment as validateConfig } from './environment.js';
+
+const testDatabaseUrl = 'postgresql://database.example.invalid/finance';
+const validateEnvironment = (input: Record<string, unknown>) =>
+  validateConfig({ DATABASE_URL: testDatabaseUrl, ...input });
 
 describe('environment configuration', () => {
   it('defaults to port 3000 and exact local frontend origins', () => {
     expect(validateEnvironment({})).toEqual({
       NODE_ENV: 'development',
       PORT: 3000,
+      DATABASE_URL: testDatabaseUrl,
       CORS_ORIGINS: ['http://localhost:5173', 'http://127.0.0.1:5173'],
     });
   });

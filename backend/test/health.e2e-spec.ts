@@ -9,6 +9,7 @@ import type { App } from 'supertest/types.js';
 import { AppModule } from '../src/app.module.js';
 import { configureApp } from '../src/configure-app.js';
 import { validateEnvironment } from '../src/config/environment.js';
+import { PrismaService } from '../src/prisma/prisma.service.js';
 
 class ValidationProbeDto {
   @IsString()
@@ -36,11 +37,14 @@ describe('API configuration and health (e2e)', () => {
       imports: [AppModule],
       controllers: [ValidationProbeController],
     })
+      .overrideProvider(PrismaService)
+      .useValue({})
       .overrideProvider(ConfigService)
       .useValue(
         new ConfigService(
           validateEnvironment({
             NODE_ENV: 'test',
+            DATABASE_URL: 'postgresql://database.example.invalid/finance',
             CORS_ORIGINS: 'http://localhost:5173,https://frontend.example',
           }),
         ),
