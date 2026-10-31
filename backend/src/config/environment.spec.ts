@@ -1,13 +1,20 @@
 import { describe, expect, it } from 'vitest';
 import { validateEnvironment as validateConfig } from './environment.js';
+import { authTestEnvironment } from '../../test/auth-fixture.js';
+import { validateAuthConfig } from '../auth/auth-config.js';
 
 const testDatabaseUrl = 'postgresql://database.example.invalid/finance';
 const validateEnvironment = (input: Record<string, unknown>) =>
-  validateConfig({ DATABASE_URL: testDatabaseUrl, ...input });
+  validateConfig({
+    DATABASE_URL: testDatabaseUrl,
+    ...authTestEnvironment,
+    ...input,
+  });
 
 describe('environment configuration', () => {
   it('defaults to port 3000 and exact local frontend origins', () => {
     expect(validateEnvironment({})).toEqual({
+      ...validateAuthConfig(authTestEnvironment, false),
       NODE_ENV: 'development',
       PORT: 3000,
       DATABASE_URL: testDatabaseUrl,

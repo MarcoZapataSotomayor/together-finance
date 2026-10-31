@@ -2,7 +2,7 @@
 
 ## Scope and boundaries
 
-The database stores financial people, not authentication accounts. Antonella, Marco, and external people such as a parent can be debtors, creditors, funders, or beneficiaries. POV never supplies these identities. Every financial operation must explicitly select stable person IDs. There are no authentication or financial CRUD endpoints in this stage.
+The database stores financial people, not authentication accounts. Antonella, Marco, and external people such as a parent can be debtors, creditors, funders, or beneficiaries. POV never supplies these identities. Every financial operation must explicitly select stable person IDs. Shared-password authentication uses separate process-local sessions without changing this schema. Financial CRUD endpoints remain a future stage.
 
 The initial migration is `20261031170000_initial_financial_schema`. Before application, read-only inspection confirmed both Neon connections worked and there were no application tables, migrations, custom types, routines, or extra schemas. The reviewed migration creates seven application tables, four enums, restrictive foreign keys, indexes, and checks. It inserts no business data. Post-migration verification found all seven tables empty.
 

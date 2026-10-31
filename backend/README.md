@@ -1,6 +1,6 @@
 ﻿# Together Finance API
 
-NestJS 12 / TypeScript with Express, Prisma 7.10.1, and Neon PostgreSQL. The only HTTP endpoint is `GET /api/health`; financial helpers and schema exist without CRUD or authentication endpoints.
+NestJS 12 / TypeScript with Express, Prisma 7.10.1, and Neon PostgreSQL. The API provides public health and shared-password authentication endpoints. Financial helpers and schema exist without CRUD endpoints. No individual accounts are created.
 
 ## Local startup
 
@@ -11,10 +11,13 @@ npm ci
 npm run prisma:validate
 npm run prisma:generate
 npm run prisma:migrate:status
+npm run auth:setup
 npm run start:dev
 ```
 
 Preserve the existing `.env`. For a fresh installation, copy `.env.example`, fill connections locally, then follow [database inspection/migration procedure](../docs/database-design.md) before applying migrations. Do not blindly migrate an unexpected existing database. API startup connects to PostgreSQL, so valid runtime configuration and network access are required.
+
+Run `auth:setup` in an interactive terminal to choose a shared password without echoing it. Setup writes only its salted scrypt hash and a separate random session secret to `.env`. It refuses existing auth keys unless explicitly passed `-- --rotate`. Restart after rotation; no plaintext password is accepted in environment configuration. See [authentication.md](../docs/authentication.md) for the complete setup and security contract.
 
 Canonical variables are `DATABASE_URL` (pooled runtime) and `DIRECT_URL` (direct migrations). The existing alternative names are supported: when `DIRECT_URL` is absent, `DATABASE_URL_POOLED` supplies runtime and the existing direct `DATABASE_URL` supplies CLI migrations. No values are rewritten or logged. Canonical `DIRECT_URL` selects canonical naming. A deployed runtime can use only its pooled `DATABASE_URL`; do not give the frontend database credentials.
 
@@ -27,9 +30,10 @@ prisma/migrations/          Reviewed versioned SQL, including custom CHECKs/inde
 scripts/                    Redacted Prisma CLI, read-only inspection/verification, API smoke test
 src/
   main.ts                   Bootstrap, host/port, shutdown hooks
-  app.module.ts             Config, Prisma, and health modules
+  app.module.ts             Config, Prisma, auth, and health modules
   configure-app.ts          /api prefix, global validation, exact-origin CORS
   config/                   Environment validation and database URL mapping/tests
+  auth/                     Controller, session service, password hashing, guards, config/tests
   prisma/                   Reusable PrismaModule/PrismaService and lifecycle tests
   generated/prisma/         Generated, Git-ignored ESM client compiled with Nest
   finance/                  Pure decimal allocation/debt/repayment rules and tests
@@ -67,9 +71,17 @@ After building, `node scripts/database-verify.mjs --expect-empty` checks this in
 
 ## Configuration and health
 
-`NODE_ENV` supports development/test/production; `PORT` defaults to 3000. Production requires exact `CORS_ORIGINS`, with no wildcards, URL credentials, paths, queries, or fragments. Cross-origin credentials remain disabled. Request validation uses `transform`, `whitelist`, and `forbidNonWhitelisted`. Future request DTOs must define validation decorators.
+`NODE_ENV` supports development/test/production; `PORT` defaults to 3000. Production requires exact HTTPS `CORS_ORIGINS`, with no wildcards, URL credentials, paths, queries, or fragments. Cross-origin credentials are enabled only for these origins. Request validation uses `transform`, `whitelist`, and `forbidNonWhitelisted`. Future request DTOs must define validation decorators.
 
 Health returns `{ "status": "ok", "application": "Together Finance" }`. It remains a liveness response, not a continuous database readiness check, though startup now requires a database connection. Full local and hosting instructions are in the [root README](../README.md).
+
+## Authentication
+
+`GET /api/auth/session` returns authentication status, a CSRF token, and absolute expiry, creating a ten-minute anonymous bootstrap session if needed. `POST /api/auth/login` verifies the shared password, rotates the cookie/CSRF token, and creates an eight-hour session by default. `POST /api/auth/logout` immediately revokes that session and clears the cookie. POST requests require JSON, a configured Origin, and `X-CSRF-Token` from the session response.
+
+Global `SessionGuard` protects routes by default. Only explicitly decorated `@Public()` routes bypass authentication; `CsrfGuard` still checks their unsafe methods, including login. POV is never inspected for authorization. There are no authentication database tables or migrations.
+
+Opaque signed sessions and login counters are bounded, process-local memory. Use one backend instance; restarts sign everyone out. A shared session/rate-limit store is required before horizontal scaling. Production cookies are Secure, HttpOnly, host-only, and use the `__Host-` prefix. Cross-site deployment limitations, proxy trust, and recovery procedures are documented in [authentication.md](../docs/authentication.md).
 
 ## Dependencies and audit
 

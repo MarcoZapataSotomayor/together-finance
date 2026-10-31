@@ -1,0 +1,32 @@
+@layer components {
+  .login-frame { width: min(100%, 510px); margin: -15px auto 0; padding: 40px 25px 50px; text-align: center; }
+  .login-crest { position: absolute; width: 105px; top: -63px; left: calc(50% - 52.5px); }
+  .login-lock { display: grid; place-items: center; width: 52px; height: 52px; margin: 0 auto 16px; border: 1.5px solid var(--frame-edge); border-radius: 50%; background: var(--mint); color: var(--primary); box-shadow: inset 0 0 0 3px var(--surface); }
+  .login-lock svg { width: 26px; height: 26px; }
+  .login-frame h1 { font-family: var(--heading-font); font-size: clamp(2.3rem, 9vw, 3.1rem); font-style: italic; font-weight: 700; color: var(--text); line-height: 1.2; }
+  .login-intro { margin: 14px auto 0; color: var(--muted-text); font-size: .92rem; line-height: 1.7; }
+  .login-frame .ornamental-divider { margin-block: 18px; }
+  .login-form { text-align: left; }
+  .login-form .form-field > label { font-size: .95rem; }
+  .password-control { position: relative; }
+  .password-control input { padding-right: 50px; min-height: 50px; }
+  .password-toggle { position: absolute; right: 3px; top: 3px; display: grid; place-items: center; width: 44px; height: 44px; color: var(--primary); border-radius: 8px; }
+  .password-toggle:disabled { cursor: default; color: var(--muted-text); }
+  .password-control input:disabled { background: var(--surface-alt); }
+  .auth-submit.button { width: 100%; min-height: 50px; margin-top: 20px; font-size: .9rem; }
+  .login-help { margin-top: 22px; color: var(--muted-text); font-size: .76rem; line-height: 1.8; }
+  .auth-progress { display: flex; justify-content: center; align-items: center; gap: 10px; color: var(--muted-text); font-size: .83rem; margin-bottom: 15px; }
+  .auth-progress:empty { display: none; }
+  .auth-progress small { display: block; margin-top: 4px; font-size: .73rem; }
+  .auth-spinner { flex-shrink: 0; width: 18px; height: 18px; border: 2px solid var(--control-border); border-top-color: transparent; border-radius: 50%; animation: auth-spin 900ms linear infinite; }
+  .auth-error, .auth-notice { position: relative; margin-bottom: 18px; padding: 12px 14px; border: 1px solid currentColor; border-radius: var(--button-radius); color: var(--danger); background: var(--surface); font-size: .82rem; line-height: 1.65; text-align: left; }
+  .auth-notice { color: var(--text); background: var(--yellow); }
+  .expense-masthead .logout-button { color: inherit; background: var(--surface); border: 1px solid var(--frame-edge); min-height: 44px; font-size: .75rem; padding: 7px 12px; }
+  [data-theme='marco'] .login-frame h1 { font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; font-size: 2.8rem; }
+  [data-theme='marco'] .login-lock { border: 2px solid var(--text); border-radius: 8px; background: var(--blue); transform: rotate(-5deg); }
+  [data-theme='marco'] .login-crest { display: none; }
+  [data-theme='marco'] .login-frame .ornamental-divider { display: flex; }
+  @keyframes auth-spin { to { transform: rotate(360deg); } }
+  @media (min-width: 640px) { .consumption-frame.login-frame { padding: 44px 43px 54px; } }
+  @media (prefers-reduced-motion: reduce) { .auth-spinner { animation: none; } }
+}

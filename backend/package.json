@@ -10,6 +10,7 @@
     "node": ">=24 <25"
   },
   "scripts": {
+    "auth:setup": "node scripts/setup-auth.mjs",
     "prisma:format": "node scripts/safe-prisma.mjs format",
     "prisma:validate": "node scripts/safe-prisma.mjs validate",
     "prisma:generate": "node scripts/safe-prisma.mjs generate",

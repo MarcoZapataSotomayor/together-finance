@@ -1,6 +1,8 @@
 import { runtimeDatabaseUrl } from './database-urls.js';
+import { validateAuthConfig } from '../auth/auth-config.js';
+import type { AuthConfig } from '../auth/auth-config.js';
 
-export interface EnvironmentConfig {
+export interface EnvironmentConfig extends AuthConfig {
   NODE_ENV: 'development' | 'test' | 'production';
   PORT: number;
   CORS_ORIGINS: string[];
@@ -58,6 +60,8 @@ export function validateEnvironment(
       ) {
         throw new Error('Invalid origin');
       }
+      if (nodeEnv === 'production' && url.protocol !== 'https:')
+        throw new Error('HTTPS required');
       return url.origin;
     } catch {
       throw new Error(
@@ -67,6 +71,7 @@ export function validateEnvironment(
   });
 
   return {
+    ...validateAuthConfig(input, nodeEnv === 'production'),
     NODE_ENV: nodeEnv,
     PORT: port,
     CORS_ORIGINS: [...new Set(origins)],
