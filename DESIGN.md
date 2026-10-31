@@ -75,7 +75,7 @@ Use curved ornamental corners and flourishes for Antonella/Shared, a scalloped S
 - Keep all interface copy in Spanish and implementation identifiers/comments in English.
 - Preserve the actual reference identities; do not return to a minimalist dashboard composition.
 - Keep required financial selections explicit. POV is never authentication, payer, owner, or proof of identity.
-- Persist only the POV preference. This prototype has no API, database, authentication, expense persistence, or financial filtering.
+- Persist only the POV preference in localStorage. Shared-password authentication uses a separate HttpOnly cookie; the expense prototype has no financial API calls, expense persistence, or financial filtering.
 - Keep decorative SVGs hidden from assistive technology and pointer input, and preserve at least 44 px touch targets.
 - Use visible focus and readable validation messages. Respect reduced-motion preferences.
 - Preserve sufficient text contrast, including on gradients. Do not solve density by shrinking editable text below 16 px.
