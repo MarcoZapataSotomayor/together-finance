@@ -1,6 +1,6 @@
 ﻿# Together Finance
 
-A private application to track personal/shared expenses, loans, debts, and repayments. The React frontend connects its themed expense form and history to a NestJS API with shared-password authentication, expense management, financial reference data, and Prisma 7 / Neon PostgreSQL. Loan/repayment management remains a future stage. Frontend POV is a visual context, never proof of identity or financial ownership.
+A private application to track personal/shared expenses, loans, debts, and repayments. The React frontend connects its themed expense form and history to a NestJS API with shared-password authentication, expense management, financial reference data, debt summaries, independent loans, repayments, and Prisma 7 / Neon PostgreSQL. Loan/repayment management is available through the API; its frontend remains a future stage. Frontend POV is a visual context, never proof of identity or financial ownership.
 
 ## Requirements and structure
 
@@ -13,6 +13,7 @@ Use Node.js 24.x and npm (verified with Node 24.18.0 and npm 11.16.0). The front
 - `docs/authentication.md`: shared-password setup, sessions, CSRF, tests, and deployment limits.
 - `docs/ci-cd.md`: GitHub Actions CI, local reproduction, and future delivery concepts.
 - `docs/expenses-api.md`: protected expense/reference endpoints, examples, transactions, and repayment safeguards.
+- `docs/debts-api.md`: protected debt summaries, independent loans, repayments, retries and restoration rules.
 - `docs/frontend-expenses.md`: API-backed form/history, reference setup, draft recovery, and validation.
 
 ## Start the frontend
@@ -85,7 +86,9 @@ The root `.gitignore` excludes `.env` and `.env.*` while allowing `.env.example`
 
 ## Backend architecture and checks
 
-`AppModule` loads configuration, `PrismaModule`, `AuthModule`, `HealthModule`, `ExpensesModule`, and `ReferenceDataModule`. The singleton `PrismaService` uses the PostgreSQL driver adapter and a bounded pool. Global authentication guards protect routes unless explicitly marked public; health, session bootstrap, and login are public. `configure-app.ts` applies the global `/api` prefix, exact-origin credentialed CORS, and DTO validation. Future request DTOs must use validation decorators for their allowed properties.
+`AppModule` loads configuration, `PrismaModule`, `AuthModule`, `HealthModule`, `ExpensesModule`, `ReferenceDataModule`, `DebtsModule`, `LoansModule`, and `RepaymentsModule`. The singleton `PrismaService` uses the PostgreSQL driver adapter and a bounded pool. Global authentication guards protect routes unless explicitly marked public; health, session bootstrap, and login are public. `configure-app.ts` applies the global `/api` prefix, exact-origin credentialed CORS, and DTO validation. Future request DTOs must use validation decorators for their allowed properties.
+
+The debt API supports filtered/paginated obligations, directional summaries, independent loan CRUD with soft deletion/restoration, and repayment creation/history/deletion/restoration. It reuses the existing schema and exact Decimal helpers. Financial writes use Serializable transactions with bounded retries, and creation UUIDs must be retained across retries. Repayment history freezes principal, parties and incurrence dates. No loan/repayment is counted as spending. See [debt API documentation](docs/debts-api.md) for payloads and limits. Current backend checks pass lint/build, 135 unit tests and 147 API tests; concurrency scenarios are mock-tested, not verified against a real PostgreSQL server. No live Neon records were created for this task.
 
 From `backend/`:
 

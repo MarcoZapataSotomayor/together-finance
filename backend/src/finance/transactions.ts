@@ -22,7 +22,7 @@ export async function financialTransaction<T>(
       if (!retryable) throw error;
       if (attempt === 2)
         throw new ConflictException(
-          'Concurrent financial changes could not be resolved. Retry the request with the same expense ID.',
+          'Concurrent financial changes could not be resolved. Retry the request with the same record ID.',
         );
       await new Promise((resolve) => setTimeout(resolve, 20 * (attempt + 1)));
     }
