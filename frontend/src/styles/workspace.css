@@ -1,0 +1,73 @@
+@layer components {
+  .expense-workspace { width: 100%; min-width: 0; }
+  .workspace-page[hidden], .form-message[hidden] { display: none !important; }
+  .plain-fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+  .plain-fieldset:disabled { opacity: .82; }
+  .expense-navigation { display: flex; justify-content: center; gap: 6px; width: fit-content; max-width: 100%; margin: -30px auto 85px; padding: 5px; border: 1.5px solid var(--frame-edge); border-radius: var(--button-radius); background: var(--paper); box-shadow: inset 0 0 0 2px var(--frame-highlight); }
+  .expense-navigation a { display: flex; align-items: center; min-height: 44px; padding: 8px 17px; border: 1px solid transparent; border-radius: var(--button-radius); font-weight: 650; font-size: .87rem; text-align: center; color: var(--primary); }
+  .expense-navigation a[aria-current] { color: var(--selection-ink); background: var(--selection-end); border-color: var(--input-border); }
+  .workspace-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-block: 12px; }
+  .workspace-actions .button, .reference-shortcuts .button, .history-pagination .button { min-height: 44px; }
+  .workspace-notice { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 13px 16px; margin-block: 14px; border: 1px solid var(--frame-edge); border-radius: var(--button-radius); background: var(--surface); color: var(--text); font-size: .86rem; line-height: 1.7; overflow-wrap: anywhere; }
+  .workspace-error { display: block; }
+  .reference-shortcuts { position: relative; margin-block: 20px; padding-block: 12px; border-block: 1px dashed var(--frame-edge); font-size: .82rem; color: var(--muted-text); }
+  .reference-shortcuts .button { padding: 7px 10px; font-size: .8rem; }
+  .reference-shortcuts summary { min-height: 44px; padding-block: 10px; color: var(--primary); font-weight: 650; cursor: pointer; }
+  .reference-editor { margin-bottom: 24px; }
+  .reference-editor h2 { font-size: 1.15rem; color: var(--primary); }
+  .reference-editor .form-field { margin-block: 14px; }
+  .beneficiary-fields { display: grid; gap: 16px; }
+  .beneficiary-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(85px, .7fr); column-gap: 10px; min-width: 0; padding-bottom: 10px; border-bottom: 1px dashed var(--frame-edge); }
+  .beneficiary-row .form-field { margin-top: 10px; }
+  .beneficiary-row .form-field:only-child { grid-column: 1 / -1; }
+  .beneficiary-row .form-field > label { min-height: 2.6em; align-items: end; font-size: .82rem; }
+  .beneficiary-row .button { margin-top: 10px; grid-column: 1 / -1; justify-self: start; }
+  .expense-workspace .scalloped-panel { padding-top: 34px; }
+  .history-state-control { max-width: 420px; margin-block: 22px; }
+  .history-frame { min-height: 450px; }
+  .history-frame .title-plaque h1 { font-size: clamp(1.8rem, 7vw, 2.8rem); }
+  .history-filters { position: relative; padding-block: 18px; border-block: 1px dashed var(--frame-edge); }
+  .history-filters summary, .record-debt summary, .record-identifier summary { padding-block: 10px; cursor: pointer; font-weight: 650; color: var(--primary); min-height: 44px; }
+  .filter-grid { display: grid; gap: 14px; padding-top: 10px; }
+  .history-toolbar { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; margin-block: 15px; font-size: .85rem; color: var(--muted-text); }
+  .expense-history-list { margin: 0; padding: 0; list-style: none; }
+  .expense-history-entry { position: relative; padding: 22px 0; border-bottom: 1px solid var(--frame-edge); }
+  .expense-record-head { display: flex; flex-direction: column; gap: 8px; margin-block: 16px; }
+  .expense-record-head h2 { font-size: 1.25rem; line-height: 1.35; overflow-wrap: anywhere; font-weight: 700; }
+  .record-classification { width: fit-content; padding: 3px 9px; margin-bottom: 9px; border: 1px solid var(--input-border); border-radius: var(--button-radius); background: var(--mint); color: var(--text); font-size: .75rem; font-weight: 650; }
+  .record-amount { font-variant-numeric: tabular-nums; font-size: clamp(1.2rem, 5vw, 1.75rem); color: var(--primary); overflow-wrap: anywhere; }
+  .record-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 22px; margin-block: 18px; font-size: .86rem; }
+  .record-facts dt, .record-debt dt { color: var(--muted-text); font-size: .76rem; }
+  .record-facts dd, .record-shares span { overflow-wrap: anywhere; }
+  .record-shares { padding: 0; margin-block: 18px; list-style: none; }
+  .record-shares > li { padding-block: 10px; border-top: 1px dashed var(--frame-edge); }
+  .record-shares > li > div:first-child { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 12px; font-size: .88rem; }
+  .record-shares strong { font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .record-shares small { color: var(--muted-text); }
+  .record-debt { margin-top: 12px; padding: 12px; border: 1px solid var(--input-border); border-radius: var(--button-radius); background: var(--yellow); font-size: .83rem; }
+  .record-debt dl { display: grid; gap: 10px; margin-block: 10px; }
+  .record-debt ul { margin-left: 15px; }
+  .record-identifier { margin-block: 20px; font-size: .8rem; }
+  .record-identifier code { display: block; overflow-wrap: anywhere; padding-block: 10px; }
+  .record-identifier a, .back-to-history, .confirmation-message a { text-decoration: underline; text-underline-offset: 3px; color: var(--primary); }
+  .back-to-history { display: inline-flex; align-items: center; min-height: 44px; }
+  .history-pagination { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px; margin-block: 22px; font-size: .85rem; }
+  .history-pagination .form-field { width: 100%; max-width: 130px; }
+  .workspace-empty { position: relative; padding: 36px 8px; text-align: center; color: var(--text); }
+  .workspace-empty h2 { font-family: var(--heading-font); font-size: 1.8rem; }
+  .workspace-empty p { margin: 15px auto 22px; max-width: 45ch; color: var(--muted-text); font-size: .88rem; }
+  .delete-confirmation { position: relative; margin-top: 20px; padding: 18px; border: 2px solid var(--danger); border-radius: var(--button-radius); background: var(--surface); font-size: .88rem; }
+  .delete-confirmation h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 10px; }
+  .confirmation-message .button { margin-top: 12px; }
+  .disabled-link { opacity: .55; cursor: default; }
+  [data-theme='marco'] .expense-navigation { border-color: var(--text); margin-bottom: 65px; }
+  [data-theme='marco'] .expense-record-head h2, [data-theme='marco'] .workspace-empty h2 { font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; }
+  @media (min-width: 640px) {
+    .filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .record-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .expense-record-head { flex-direction: row; justify-content: space-between; align-items: start; }
+    .record-debt dl { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .expense-navigation { margin-top: -20px; }
+  }
+  @media (min-width: 960px) { .history-frame { max-width: 1050px; } .filter-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } .record-facts { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+}
