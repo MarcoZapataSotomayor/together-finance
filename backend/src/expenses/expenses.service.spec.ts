@@ -333,6 +333,23 @@ describe('expense transactions and financial rules', () => {
     expect(store.repayments).toHaveLength(1);
   });
 
+  it('lists deleted records separately without including their debts in active balances', async () => {
+    await service.create(exampleExpense());
+    await service.remove(ids.expense);
+    const query = Object.assign(new ExpenseQueryDto(), {
+      deletionState: 'deleted',
+      pageSize: 1,
+    });
+    const deleted = await service.list(query);
+    expect(deleted.total).toBe(1);
+    expect(deleted.data[0].allocations[0].debt?.status).toBe('INACTIVE');
+    expect(deleted.data[0].allocations[0].debt?.outstandingAmount).toBe('0.00');
+    expect((await service.list(new ExpenseQueryDto())).total).toBe(0);
+    await service.restore(ids.expense);
+    expect((await service.list(query)).total).toBe(0);
+    expect((await service.list(new ExpenseQueryDto())).total).toBe(1);
+  });
+
   it('paginates and combines date/category/beneficiary/funder/classification filters', async () => {
     await service.create(exampleExpense());
     await service.create(

@@ -136,6 +136,10 @@ export class UpdateExpenseDto {
 
 export class ExpenseQueryDto extends PaginationDto {
   @IsOptional()
+  @IsIn(['active', 'deleted'])
+  deletionState: 'active' | 'deleted' = 'active';
+
+  @IsOptional()
   @IsString()
   @Matches(datePattern)
   purchasedFrom?: string;

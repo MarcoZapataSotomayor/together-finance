@@ -8,9 +8,12 @@ export interface AuthState {
   waking: boolean
   error: string
   notice: string
+  logoutVersion: number
   login: (password: string) => Promise<void>
   logout: () => Promise<void>
   reconnect: () => void
+  expireSession: () => void
+  refreshSession: () => Promise<void>
 }
 
 export const AuthContext = createContext<AuthState | undefined>(undefined)

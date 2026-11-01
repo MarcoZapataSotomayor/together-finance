@@ -1,6 +1,6 @@
-﻿# Together Finance API
+# Together Finance API
 
-NestJS 12 / TypeScript with Express, Prisma 7.10.1, and Neon PostgreSQL. The API provides public health, shared-password authentication, protected expense management, and financial reference-data endpoints. No individual accounts are created. The frontend remains unchanged and is not yet connected to expense persistence.
+NestJS 12 / TypeScript with Express, Prisma 7.10.1, and Neon PostgreSQL. The API provides public health, shared-password authentication, protected expense management, and financial reference-data endpoints. No individual accounts are created. The frontend now uses these endpoints; see [frontend integration](../docs/frontend-expenses.md).
 
 ## Local startup
 
@@ -56,7 +56,7 @@ Protected routes: `POST/GET /api/expenses`, `GET/PATCH/DELETE /api/expenses/:id`
 
 Expense writes and related allocations/debts use serializable interactive transactions with bounded whole-operation retries. No repayment row is rewritten or removed. Repayment history freezes debt principal/parties/date; incompatible corrections return 409. Delete changes only the parent flag; restore revalidates related financial records before reviving eligible children. Tests cover rollback/retry behavior with mocks, not real PostgreSQL concurrency.
 
-No migration was required. Before manual API writes, verify the configured connection against the intended Neon development branch in the console. The implementation's validation created no live database records and made no branch identity assertion. Do not use the real database as a fixture store. Current validation passes build/lint, 95 unit tests, and 70 API tests.
+No migration was required. Before manual API writes, verify the configured connection against the intended Neon development branch in the console. The implementation's validation created no live database records and made no branch identity assertion. Do not use the real database as a fixture store. Current validation passes build/lint, 96 unit tests, and 70 API tests.
 
 ## Commands
 
@@ -88,6 +88,8 @@ After building, `node scripts/database-verify.mjs --expect-empty` checks this in
 Health returns `{ "status": "ok", "application": "Together Finance" }`. It remains a liveness response, not a continuous database readiness check, though startup now requires a database connection. Full local and hosting instructions are in the [root README](../README.md).
 
 ## Authentication
+
+Frontend integration added one backwards-compatible list parameter: `GET /api/expenses?deletionState=deleted` lists deleted records for recovery. Default `active` mode, filters, pagination, authentication, and financial-write rules remain unchanged. This addition requires no migration and passes backend lint/build, 96 unit tests, and 70 API tests.
 
 `GET /api/auth/session` returns authentication status, a CSRF token, and absolute expiry, creating a ten-minute anonymous bootstrap session if needed. `POST /api/auth/login` verifies the shared password, rotates the cookie/CSRF token, and creates an eight-hour session by default. `POST /api/auth/logout` immediately revokes that session and clears the cookie. POST requests require JSON, a configured Origin, and `X-CSRF-Token` from the session response.
 

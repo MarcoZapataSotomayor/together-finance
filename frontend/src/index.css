@@ -2,6 +2,7 @@
 @import './theme/tokens.css';
 @import './styles/expense.css';
 @import './styles/auth.css';
+@import './styles/workspace.css';
 
 @layer base {
   html { scroll-padding-top: 1.5rem; }

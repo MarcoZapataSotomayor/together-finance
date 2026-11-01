@@ -1,6 +1,6 @@
 ﻿# Together Finance
 
-A private application to track personal/shared expenses, loans, debts, and repayments. The repository contains a React visual prototype and a NestJS API with shared-password authentication, expense management, financial reference data, and a Prisma 7 / Neon PostgreSQL foundation. Loan/repayment endpoints and frontend financial API integration remain future stages. Frontend POV is a visual context, never proof of identity or financial ownership.
+A private application to track personal/shared expenses, loans, debts, and repayments. The React frontend connects its themed expense form and history to a NestJS API with shared-password authentication, expense management, financial reference data, and Prisma 7 / Neon PostgreSQL. Loan/repayment management remains a future stage. Frontend POV is a visual context, never proof of identity or financial ownership.
 
 ## Requirements and structure
 
@@ -13,6 +13,7 @@ Use Node.js 24.x and npm (verified with Node 24.18.0 and npm 11.16.0). The front
 - `docs/authentication.md`: shared-password setup, sessions, CSRF, tests, and deployment limits.
 - `docs/ci-cd.md`: GitHub Actions CI, local reproduction, and future delivery concepts.
 - `docs/expenses-api.md`: protected expense/reference endpoints, examples, transactions, and repayment safeguards.
+- `docs/frontend-expenses.md`: API-backed form/history, reference setup, draft recovery, and validation.
 
 ## Start the frontend
 
@@ -59,7 +60,7 @@ Expected JSON:
 
 The interactive setup hides the password and saves only a salted hash and an independently generated session secret to the ignored backend `.env`. It preserves database configuration and refuses to replace existing auth keys unless explicitly run with `npm run auth:setup -- --rotate`. Choose your own password locally; no default password exists. Restart the API after changing authentication configuration.
 
-Startup connects Prisma to the configured database. This public health endpoint remains a process liveness check, not a continuous database readiness probe. Vite proxies `/api` to port 3000 for local authentication; the expense form remains a prototype without financial API calls.
+Startup connects Prisma to the configured database. This public health endpoint remains a process liveness check, not a continuous database readiness probe. Vite proxies `/api` to port 3000 for authentication and financial requests. Before manual writes, verify the intended Neon development branch. The UI creates reference data only on explicit actions and supports saving, listing, editing, soft deletion, and restoration of expenses.
 
 ## API configuration
 
@@ -116,4 +117,4 @@ GitHub Actions runs independent **Frontend** and **Backend** CI jobs for PRs tar
 
 These are configuration instructions, not completed deployments. Configure the required authentication keys as private backend environment variables. The current session/rate-limit store supports **one backend instance**; restart or redeployment ends all sessions. For reliable cookies, prefer a same-origin `/api` reverse proxy or HTTPS subdomains under the same registrable domain. Separate `vercel.app` / `onrender.com` domains require `SameSite=None; Secure`, and browsers can still block their third-party cookies. See [authentication deployment options](docs/authentication.md#production-deployment) before deploying. Expense/reference endpoints are implemented; verify the intended development database before manual writes and read [expense safeguards](docs/expenses-api.md).
 
-See the [frontend documentation](frontend/README.md) for the visual prototype and [backend documentation](backend/README.md) for the API structure and audit findings.
+See the [frontend documentation](frontend/README.md) for the expense interface and [backend documentation](backend/README.md) for the API structure and audit findings.

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { AuthContext } from './AuthContext'
 import type { AuthState } from './AuthContext'
@@ -15,6 +15,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
   const [attempt, setAttempt] = useState(0)
+  const [logoutVersion, setLogoutVersion] = useState(0)
 
   function accept(next: SessionResponse) {
     setSession(next)
@@ -23,6 +24,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   function reconnect() {
     setPhase('checking'); setSession(null); setWaking(false); setError(''); setAttempt(value => value + 1)
+  }
+
+  const expireSession = useCallback(() => {
+    setNotice('Tu sesión terminó. Ingresa de nuevo para continuar.')
+    setSession(null); setPhase('checking'); setAttempt(value => value + 1)
+  }, [])
+
+  async function refreshSession() {
+    const next = await fetchSession(apiUrl)
+    if (next.authenticated) accept(next)
+    else expireSession()
   }
 
   useEffect(() => {
@@ -65,12 +77,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await authRequest<void>(apiUrl, 'logout', { method: 'POST', csrfToken: session.csrfToken, body: {} })
       setNotice('Cerraste el acceso. Tus preferencias de estilo se mantienen.')
+      setLogoutVersion(value => value + 1)
       reconnect()
     } catch (failure) {
-      if (failure instanceof AuthRequestError && failure.status === 401) { setNotice('Tu sesión ya terminó.'); reconnect() }
+      if (failure instanceof AuthRequestError && failure.status === 401) { setNotice('Tu sesión ya terminó.'); setLogoutVersion(value => value + 1); reconnect() }
       else setError('No pudimos cerrar la sesión. La conexión falló; inténtalo de nuevo.')
     } finally { setOperation(null) }
   }
 
-  return <AuthContext.Provider value={{ phase, session, operation, waking, error, notice, login, logout, reconnect }}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={{ phase, session, operation, waking, error, notice, login, logout, reconnect, expireSession, refreshSession, logoutVersion }}>{children}</AuthContext.Provider>
 }

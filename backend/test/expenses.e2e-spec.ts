@@ -201,6 +201,16 @@ describe('authenticated expense and reference API (mocked database)', () => {
     store.addRepayment('20');
     await api('delete', `/expenses/${ids.expense}`).expect(204);
     expect((await api('get', '/expenses').expect(200)).body.total).toBe(0);
+    const trash = await api(
+      'get',
+      '/expenses?deletionState=deleted&pageSize=1',
+    ).expect(200);
+    expect(trash.body.total).toBe(1);
+    expect(trash.body.data[0].id).toBe(ids.expense);
+    expect(trash.body.data[0].allocations[0].debt.status).toBe('INACTIVE');
+    await request(app.getHttpServer())
+      .get('/api/expenses?deletionState=deleted')
+      .expect(401);
     const deleted = await api('get', `/expenses/${ids.expense}`).expect(200);
     expect(deleted.body.allocations[0].debt.status).toBe('INACTIVE');
     expect(deleted.body.allocations[0].debt.repayments).toHaveLength(1);
@@ -209,6 +219,10 @@ describe('authenticated expense and reference API (mocked database)', () => {
       .expect(200);
     expect(restored.body.allocations[0].debt.outstandingAmount).toBe('30.00');
     expect(store.debts).toHaveLength(1);
+    expect(
+      (await api('get', '/expenses?deletionState=deleted').expect(200)).body
+        .total,
+    ).toBe(0);
     await api('post', `/expenses/${ids.expense}/restore`)
       .send({ amount: '1' })
       .expect(400);
@@ -232,6 +246,7 @@ describe('authenticated expense and reference API (mocked database)', () => {
       '/expenses?purchasedFrom=2026-11-01&purchasedTo=2026-10-01',
     ).expect(400);
     await api('get', '/expenses?pov=antonella').expect(400);
+    await api('get', '/expenses?deletionState=all').expect(400);
     await api('get', '/expenses/not-a-uuid').expect(400);
     await api('get', '/expenses/00000000-0000-4000-8000-000000000099').expect(
       404,

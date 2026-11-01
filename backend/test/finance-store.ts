@@ -166,7 +166,9 @@ export class FinanceStore {
   }
   private matchesExpense(row: Expense, where: any) {
     return (
-      row.deletedAt === null &&
+      (where.deletedAt === null
+        ? row.deletedAt === null
+        : row.deletedAt !== null) &&
       (!where.categoryId || row.categoryId === where.categoryId) &&
       (!where.fundedByPersonId ||
         row.fundedByPersonId === where.fundedByPersonId) &&

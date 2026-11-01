@@ -214,7 +214,7 @@ export class ExpensesService {
         'The start date must not be after the end date.',
       );
     const where: Prisma.ExpenseWhereInput = {
-      deletedAt: null,
+      deletedAt: query.deletionState === 'deleted' ? { not: null } : null,
       categoryId: query.categoryId,
       fundedByPersonId: query.fundedByPersonId,
       classification: query.classification,

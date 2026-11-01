@@ -29,7 +29,7 @@ From `frontend/`, run `npm ci` and `npm run dev`. Vite proxies `/api` to port 30
 
 The client first requests the session with `credentials: include`. A new anonymous bootstrap cookie is valid for ten minutes. Login requires that cookie, its returned `X-CSRF-Token`, JSON content type, and an exact allowed `Origin`. A successful login issues a fresh authenticated cookie and CSRF token, invalidating the anonymous session. The client confirms the cookie through another session GET before opening private content. This catches browsers that block cookies instead of pretending authentication succeeded.
 
-The frontend keeps session metadata and CSRF tokens only in React memory. The session identifier is available only through its HttpOnly cookie. Refresh restores access from the backend; logout or expiry unmounts the financial form. POV is persisted independently using the existing localStorage preference. No expense data is persisted by this task.
+The frontend keeps session metadata and CSRF tokens only in React memory. The session identifier is available only through its HttpOnly cookie. Refresh restores access from the backend; logout or expiry unmounts private views. Unsaved expense input and pending request IDs survive expiry in a separate memory-only provider for reauthentication; explicit logout or page reload clears them. POV remains independent in localStorage. Expense persistence now uses the API; see [frontend integration](frontend-expenses.md).
 
 ## Passwords, sessions, and expiration
 

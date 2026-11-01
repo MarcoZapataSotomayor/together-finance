@@ -1,12 +1,15 @@
 import { AppShell } from './components/AppShell'
-import { NewExpenseScreen } from './features/expenses/NewExpenseScreen'
+import { ExpenseWorkspace } from './features/expenses/ExpenseWorkspace'
 import { AuthGate } from './auth/AuthGate'
 import { LogoutButton } from './auth/LogoutButton'
+import { useAuth } from './auth/useAuth'
+import { ExpenseDraftProvider } from './features/expenses/ExpenseDraftProvider'
 
 function App() {
+  const { logoutVersion } = useAuth()
   return (
     <AppShell headerAction={<LogoutButton />}>
-      <AuthGate><NewExpenseScreen /></AuthGate>
+      <ExpenseDraftProvider key={logoutVersion}><AuthGate><ExpenseWorkspace /></AuthGate></ExpenseDraftProvider>
     </AppShell>
   )
 }

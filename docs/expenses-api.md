@@ -1,6 +1,6 @@
 # Expense and reference-data API
 
-The backend now persists expenses, allocations, and expense-origin debts through Prisma 7.10.1. The approved frontend remains a separate prototype and has not been connected to these endpoints. Independent loans, repayment mutations, balances across expenses, and financial revision/audit workflows are outside this stage.
+The backend persists expenses, allocations, and expense-origin debts through Prisma 7.10.1. The frontend now uses these endpoints; see [frontend-expenses.md](frontend-expenses.md). Independent loans, repayment mutations, balances across expenses, and financial revision/audit workflows are outside this stage.
 
 All examples below are synthetic. Do not run them against a live database just to validate the code. Before any manual write, verify the branch in the Neon console and confirm that the locally configured connection belongs to the intended **development** branch. A database name or endpoint URL alone is not reliable evidence of branch identity. This implementation was validated with mocks, without verifying or writing to a configured Neon branch.
 
@@ -11,7 +11,7 @@ Every route below inherits the global shared-session guard. State-changing reque
 | Method and path | Behavior | Success |
 | --- | --- | --- |
 | `POST /api/expenses` | Create atomically, or replay the same client-generated ID | 201 |
-| `GET /api/expenses` | Paginated active expenses, with optional financial filters | 200 |
+| `GET /api/expenses` | Paginated active expenses by default, or deleted records with `deletionState=deleted` | 200 |
 | `GET /api/expenses/:id` | Details and retained history, including a deleted expense | 200 |
 | `PATCH /api/expenses/:id` | Amend supplied fields and synchronize allocations/debts | 200 |
 | `DELETE /api/expenses/:id` | Soft-delete the expense; repeated deletion is a no-op | 204 |
@@ -118,6 +118,7 @@ All listing endpoints accept `page` (default 1, range 1–100000) and `pageSize`
 
 | Parameter | Meaning |
 | --- | --- |
+| `deletionState` | `active` (default) or `deleted`; both modes require authentication |
 | `purchasedFrom`, `purchasedTo` | Inclusive purchase-date range; start must not exceed end |
 | `categoryId` | Explicit category UUID |
 | `beneficiaryPersonId` | Person with an active allocation in the expense |
@@ -177,6 +178,6 @@ Controller exception filters preserve intentional HTTP errors and replace databa
 
 Run backend `npm run prisma:validate`, `npm run prisma:generate` (also part of prebuild), `npm run lint`, `npm test`, `npm run test:e2e`, and `npm run build`. Test fixtures use only synthetic IDs/values and mock Prisma; no migration, reset, seed, live server startup, or database write is needed. The current CI workflow discovers the new test files automatically.
 
-Validation passed: lint without warnings, production build, **95 unit tests** and **70 API tests** including the existing suites. New tests cover personal/shared/third-party funding, exact cents, invalid/duplicate participants and references, safe creation replay, debt-link reuse, amendments, frozen repayment terms, soft deletion/restoration, pagination/filters, every route's authentication, mutation CSRF, whitelist rules, rollback expectations, and transaction conflicts.
+Validation passed: lint without warnings, production build, **96 unit tests** and **70 API tests** including the existing suites. New tests cover personal/shared/third-party funding, exact cents, invalid/duplicate participants and references, safe creation replay, debt-link reuse, amendments, frozen repayment terms, soft deletion/restoration, pagination/filters, every route's authentication, mutation CSRF, whitelist rules, rollback expectations, and transaction conflicts.
 
 No schema/migration files or dependency versions changed. No real database records were created during validation, and no live Neon branch identity/connectivity was asserted. Actual concurrent PostgreSQL integration testing and an immutable correction/audit workflow remain outstanding. Production session/cookie deployment limitations remain those documented in authentication.md. Measure query behavior against representative isolated data before adding indexes or changing pagination; this initial implementation bounds expense pages but includes related history.

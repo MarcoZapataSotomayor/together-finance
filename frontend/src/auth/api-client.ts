@@ -1,15 +1,6 @@
-export class AuthRequestError extends Error {
-  readonly status: number
-  constructor(status: number) { super('Authentication request failed'); this.status = status }
-}
-
-interface RequestOptions {
-  method?: 'GET' | 'POST'
-  csrfToken?: string
-  body?: unknown
-  signal?: AbortSignal
-  timeoutMs?: number
-}
+import { ApiError as AuthRequestError, apiRequest } from '../api/client.ts'
+import type { RequestOptions } from '../api/client.ts'
+export { AuthRequestError }
 
 export interface SessionResponse {
   authenticated: boolean
@@ -18,26 +9,7 @@ export interface SessionResponse {
 }
 
 export async function authRequest<T>(baseUrl: string, path: string, options: RequestOptions = {}, fetcher: typeof fetch = fetch): Promise<T> {
-  const timeout = AbortSignal.timeout(options.timeoutMs ?? 30000)
-  const signal = options.signal ? AbortSignal.any([options.signal, timeout]) : timeout
-  try {
-    const response = await fetcher(`${baseUrl.replace(/\/$/, '')}/auth/${path}`, {
-      method: options.method ?? 'GET',
-      credentials: 'include',
-      cache: 'no-store',
-      redirect: 'error',
-      signal,
-      headers: { ...(options.method === 'POST' ? { 'Content-Type': 'application/json' } : {}), ...(options.csrfToken ? { 'X-CSRF-Token': options.csrfToken } : {}) },
-      ...(options.body !== undefined ? { body: JSON.stringify(options.body) } : {}),
-    })
-    if (!response.ok) throw new AuthRequestError(response.status)
-    if (response.status === 204) return undefined as T
-    return await response.json() as T
-  } catch (error) {
-    if (options.signal?.aborted) throw options.signal.reason
-    if (error instanceof AuthRequestError) throw error
-    throw new AuthRequestError(0)
-  }
+  return apiRequest<T>(baseUrl, `auth/${path}`, options, fetcher)
 }
 
 export function isSessionResponse(value: unknown): value is SessionResponse {
