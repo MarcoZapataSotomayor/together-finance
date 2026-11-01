@@ -1,6 +1,6 @@
 ﻿# Together Finance
 
-A private application to track personal/shared expenses, loans, debts, and repayments. The React frontend connects its themed expense form and history to a NestJS API with shared-password authentication, expense management, financial reference data, debt summaries, independent loans, repayments, and Prisma 7 / Neon PostgreSQL. Loan/repayment management is available through the API; its frontend remains a future stage. Frontend POV is a visual context, never proof of identity or financial ownership.
+A private application to track personal/shared expenses, loans, debts, and repayments. The React frontend connects its themed expense, debt, loan and repayment screens to a NestJS API with shared-password authentication and Prisma 7 / Neon PostgreSQL. Frontend POV controls the visual context and visible debt filters, never proof of identity or financial ownership. Mutation forms require explicit financial parties.
 
 ## Requirements and structure
 
@@ -15,6 +15,7 @@ Use Node.js 24.x and npm (verified with Node 24.18.0 and npm 11.16.0). The front
 - `docs/expenses-api.md`: protected expense/reference endpoints, examples, transactions, and repayment safeguards.
 - `docs/debts-api.md`: protected debt summaries, independent loans, repayments, retries and restoration rules.
 - `docs/frontend-expenses.md`: API-backed form/history, reference setup, draft recovery, and validation.
+- `docs/frontend-debts.md`: debt/loan/payment screens, directional POV defaults, exact amounts, retry recovery, browser validation and limitations.
 
 ## Start the frontend
 

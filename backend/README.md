@@ -1,6 +1,6 @@
 # Together Finance API
 
-NestJS 12 / TypeScript with Express, Prisma 7.10.1, and Neon PostgreSQL. The API provides public health, shared-password authentication, protected expenses/reference data, debt summaries, independent loans and repayments. No individual accounts are created. The frontend uses the expense/reference endpoints; see [frontend integration](../docs/frontend-expenses.md). Debt/loan/repayment UI remains a future stage.
+NestJS 12 / TypeScript with Express, Prisma 7.10.1, and Neon PostgreSQL. The API provides public health, shared-password authentication, protected expenses/reference data, debt summaries, independent loans and repayments. No individual accounts are created. The frontend consumes these existing endpoints; see [expense integration](../docs/frontend-expenses.md) and [debt/loan/repayment integration](../docs/frontend-debts.md). The latter requires no backend compatibility or schema change.
 
 ## Local startup
 
