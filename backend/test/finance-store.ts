@@ -184,6 +184,57 @@ export class FinanceStore {
         ))
     );
   }
+  private detailedDebt(id: string) {
+    const debt = this.debts.find((row) => row.id === id);
+    if (!debt) return null;
+    const source = this.allocations.find(
+      (row) => row.id === debt.expenseAllocationId,
+    );
+    return {
+      ...debt,
+      debtor: this.people.find((row) => row.id === debt.debtorPersonId),
+      creditor: this.people.find((row) => row.id === debt.creditorPersonId),
+      expenseAllocation: source
+        ? {
+            ...source,
+            expense: this.expenses.find((row) => row.id === source.expenseId),
+          }
+        : null,
+      repayments: this.repayments
+        .filter((row) => row.debtId === id)
+        .map((row) => ({ ...row })),
+    };
+  }
+  private matchesDebt(row: Debt, where: any): boolean {
+    if (
+      where.AND &&
+      !where.AND.every((condition: any) => this.matchesDebt(row, condition))
+    )
+      return false;
+    if (
+      where.OR &&
+      !where.OR.some((condition: any) => this.matchesDebt(row, condition))
+    )
+      return false;
+    if (where.NOT && this.matchesDebt(row, where.NOT)) return false;
+    const source = this.allocations.find(
+      (record) => record.id === row.expenseAllocationId,
+    );
+    const expense = this.expenses.find(
+      (record) => record.id === source?.expenseId,
+    );
+    return (
+      (where.deletedAt === undefined || row.deletedAt === where.deletedAt) &&
+      (!where.origin || row.origin === where.origin) &&
+      (!where.debtorPersonId || row.debtorPersonId === where.debtorPersonId) &&
+      (!where.creditorPersonId ||
+        row.creditorPersonId === where.creditorPersonId) &&
+      (!where.incurredOn?.gte || row.incurredOn >= where.incurredOn.gte) &&
+      (!where.incurredOn?.lte || row.incurredOn <= where.incurredOn.lte) &&
+      (!where.expenseAllocation ||
+        (!!source && !source.deletedAt && !!expense && !expense.deletedAt))
+    );
+  }
   readonly client = {
     person: this.references('people'),
     category: this.references('categories'),
@@ -240,6 +291,33 @@ export class FinanceStore {
       }),
     },
     debt: {
+      findUnique: vi.fn(async ({ where }: any) => this.detailedDebt(where.id)),
+      findMany: vi.fn(async ({ where, cursor, skip = 0, take = 100 }: any) => {
+        const rows = this.debts
+          .filter((row) => this.matchesDebt(row, where))
+          .sort((a, b) => a.id.localeCompare(b.id));
+        const start = cursor
+          ? rows.findIndex((row) => row.id === cursor.id) + skip
+          : skip;
+        return rows
+          .slice(start, start + take)
+          .map((row) => this.detailedDebt(row.id));
+      }),
+      create: vi.fn(async ({ data }: any) => {
+        if (this.debts.some((row) => row.id === data.id))
+          throw databaseFailure('P2002');
+        if (this.failDebtWrite) throw databaseFailure('P2004');
+        const row = {
+          expenseAllocationId: null,
+          dueOn: null,
+          description: null,
+          deletedAt: null,
+          ...data,
+          ...audit(),
+        };
+        this.debts.push(row);
+        return row;
+      }),
       upsert: vi.fn(async ({ where, create, update }: any) => {
         if (this.failDebtWrite) throw databaseFailure('P2004');
         let row = this.debts.find(
@@ -260,8 +338,26 @@ export class FinanceStore {
       }),
       update: vi.fn(async ({ where, data }: any) => {
         const row = this.debts.find((record) => record.id === where.id)!;
-        Object.assign(row, data);
+        Object.assign(row, data, { updatedAt: new Date() });
         return row;
+      }),
+    },
+    repayment: {
+      findUnique: vi.fn(async ({ where }: any) => {
+        const row = this.repayments.find((record) => record.id === where.id);
+        return row ? { ...row } : null;
+      }),
+      create: vi.fn(async ({ data }: any) => {
+        if (this.repayments.some((row) => row.id === data.id))
+          throw databaseFailure('P2002');
+        const row = { ...data, deletedAt: null, ...audit() };
+        this.repayments.push(row);
+        return { ...row };
+      }),
+      update: vi.fn(async ({ where, data }: any) => {
+        const row = this.repayments.find((record) => record.id === where.id)!;
+        Object.assign(row, data, { updatedAt: new Date() });
+        return { ...row };
       }),
     },
     $transaction: vi.fn(

@@ -41,6 +41,6 @@ export function LoginScreen() {
       </div>
       {unavailable && !checking ? <Button className="auth-submit" onClick={auth.reconnect}><Icon name="arrows" />Volver a conectar</Button> : <Button type="submit" className="auth-submit" disabled={busy || !password}><Icon name="lock" />{auth.operation === 'login' ? 'Entrando…' : 'Entrar a nuestro espacio'}</Button>}
     </form>
-    <p id="login-help" className="login-help">El acceso es para los dos.<br />Tu perspectiva solo cambia el estilo.</p>
+    <p id="login-help" className="login-help">El acceso es para los dos.<br />Tu perspectiva cambia la vista; no tu identidad.</p>
   </section>
 }

@@ -1,6 +1,6 @@
 # Together Finance frontend
 
-React, TypeScript, Vite, and Tailwind CSS v4. Shared-password login protects the API-backed Nuevo consumo form and expense history. Antonella, Marco, and Shared retain the approved fonts, tokens, ornate/comic frames, and lightweight SVG artwork. See [DESIGN.md](../DESIGN.md) for the visual contract.
+React, TypeScript, Vite, and Tailwind CSS v4. Shared-password login protects API-backed expenses, debts, independent loans and repayments. Antonella, Marco, and Shared retain the approved fonts, tokens, ornate/comic frames, and lightweight SVG artwork. See [DESIGN.md](../DESIGN.md) for the visual contract.
 
 ## Run and validate
 
@@ -25,15 +25,19 @@ Historial supports pagination, all financial filters, Activos / Eliminados, deta
 
 ## Structure and details
 
+Deudas shows server-confirmed directional totals, origin/status/person/date filters, debtor/creditor breakdowns and details. Préstamos supports explicit-party creation, editing, confirmed soft deletion and restoration. Pagos opens each debt's partial/full payment flow and paginated active/deleted history. New financial forms never infer parties from POV. Ambiguous POV-to-person matches require explicit mapping. See [frontend-debts.md](../docs/frontend-debts.md) for all routes, exact-money handling, retry recovery and limitations.
+
 - src/api/: shared transport, actual API types, finance operations, and error mapping.
 - src/auth/: login/session/logout, CSRF refresh, expiry handling, and draft reset signaling.
 - src/features/expenses/: workspace, existing form composition, reference editor, history/details, exact mapping, submission controller, and memory-only draft provider.
+- src/features/debts/: overview, loan/debt/payment details, forms/history, exact mapping, POV filters, confirmed actions and memory-only UUID/draft recovery.
 - src/theme/, src/components/ui/, and src/components/decorations/: preserved POV system, reusable controls, and original SVG ornaments.
 - src/styles/workspace.css: scoped integration styling; original expense.css and theme tokens remain unchanged.
-- tests/: 31 native Node tests for auth/client behavior, exact mapping, reference loading, CRUD, validation, UUID reuse, and error recovery.
+- src/styles/debts.css: scoped debt layouts, reused theme geometry and wrapped financial navigation.
+- tests/: 52 native Node tests for auth/client behavior, exact mapping, POV defaults, reference loading, financial operations, validation, UUID reuse/correction, and error recovery.
 
 Read [frontend-expenses.md](../docs/frontend-expenses.md) for architecture, endpoint mapping, retry/draft behavior, limitations, and the manual release checklist. [expenses-api.md](../docs/expenses-api.md) documents the backend contract. Locally bundled heading fonts retain their existing SIL licenses.
 
 ## Validation
 
-Frontend lint, 31 tests, and production build pass. Headless Edge checks with synthetic responses covered all themes at 320/375/390/768/1440 px, empty setup, CRUD, restoration after reload, financial-role preservation across POVs, keyboard behavior, 401 draft recovery, logout, 403/409 feedback, network failures, and cold starts. No live Neon records were created. Physical devices, Safari/Firefox, actual Neon persistence, and deployment cookie behavior still need release validation.
+Frontend lint, 52 tests, and production build pass. Expense-stage headless Edge checks covered empty setup, CRUD, restoration after reload, keyboard behavior, 403 revalidation and cold starts. The new isolated debt browser script passed 90 surface/theme/width combinations at 320/375/390/768/1440 px plus loan/payment operations, explicit parties, POV mapping, overpayment/restoration conflicts, UUID retries/corrections, 401 draft recovery and logout clearing. See [browser validation instructions](../docs/frontend-debts.md#validation). No live Neon data was modified. Physical devices, Safari/Firefox, screen readers, actual Neon persistence, and deployment cookie behavior still need release validation.

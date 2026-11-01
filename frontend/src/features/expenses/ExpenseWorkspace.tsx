@@ -20,6 +20,7 @@ import { NewExpenseScreen } from './NewExpenseScreen'
 import type { CreatedReference, ReferenceKind } from './ReferenceEditor'
 import { useFinanceApi } from './useFinanceApi'
 import { useResource } from './useResource'
+import { DebtWorkspace } from '../debts/DebtWorkspace'
 
 function subscribe(listener: () => void) {
   window.addEventListener('hashchange', listener)
@@ -61,6 +62,7 @@ export function ExpenseWorkspace() {
   const segments = route.split('/')
   const isNew = route === '/expenses/new'
   const isHistory = route === '/expenses'
+  const isDebtSection = /^\/(debts|loans|repayments)(\/|$)/.test(route)
   const id = segments[2]?.toLowerCase() ?? ''
   const isDetail =
     segments[1] === 'expenses' &&
@@ -95,7 +97,7 @@ export function ExpenseWorkspace() {
   }
   return (
     <div className="expense-workspace">
-      <nav className="expense-navigation" aria-label="Navegación de consumos">
+      <nav className="expense-navigation finance-navigation" aria-label="Navegación financiera">
         <a href="#/expenses/new" aria-current={isNew ? 'page' : undefined}>
           Nuevo consumo
         </a>
@@ -103,8 +105,11 @@ export function ExpenseWorkspace() {
           href="#/expenses"
           aria-current={isHistory || isDetail ? 'page' : undefined}
         >
-          Historial
+          Consumos
         </a>
+        <a href="#/debts" aria-current={segments[1] === 'debts' ? 'page' : undefined}>Deudas</a>
+        <a href="#/loans" aria-current={segments[1] === 'loans' ? 'page' : undefined}>Préstamos</a>
+        <a href="#/repayments" aria-current={segments[1] === 'repayments' ? 'page' : undefined}>Pagos</a>
       </nav>
       {resource.loading && (
         <LoadingNotice text="Cargando personas, categorías y medios de pago…" />
@@ -148,7 +153,8 @@ export function ExpenseWorkspace() {
           onDeleted={changed}
         />
       )}
-      {!isNew && !isHistory && !isDetail && (
+      {isDebtSection && <DebtWorkspace route={route} financeApi={api} references={references} ready={ready} version={version} onChanged={changed} onReferenceCreated={createdReference} onReloadReferences={() => setReferenceVersion(value => value + 1)} />}
+      {!isNew && !isHistory && !isDetail && !isDebtSection && (
         <section className="workspace-empty">
           <h1>No encontramos esta página</h1>
           <a href="#/expenses">Volver al historial</a>

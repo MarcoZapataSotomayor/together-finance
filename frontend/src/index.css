@@ -3,6 +3,7 @@
 @import './styles/expense.css';
 @import './styles/auth.css';
 @import './styles/workspace.css';
+@import './styles/debts.css';
 
 @layer base {
   html { scroll-padding-top: 1.5rem; }

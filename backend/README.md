@@ -1,6 +1,6 @@
 # Together Finance API
 
-NestJS 12 / TypeScript with Express, Prisma 7.10.1, and Neon PostgreSQL. The API provides public health, shared-password authentication, protected expense management, and financial reference-data endpoints. No individual accounts are created. The frontend now uses these endpoints; see [frontend integration](../docs/frontend-expenses.md).
+NestJS 12 / TypeScript with Express, Prisma 7.10.1, and Neon PostgreSQL. The API provides public health, shared-password authentication, protected expenses/reference data, debt summaries, independent loans and repayments. No individual accounts are created. The frontend uses the expense/reference endpoints; see [frontend integration](../docs/frontend-expenses.md). Debt/loan/repayment UI remains a future stage.
 
 ## Local startup
 
@@ -30,7 +30,7 @@ prisma/migrations/          Reviewed versioned SQL, including custom CHECKs/inde
 scripts/                    Redacted Prisma CLI, read-only inspection/verification, API smoke test
 src/
   main.ts                   Bootstrap, host/port, shutdown hooks
-  app.module.ts             Config, Prisma, auth, health, expenses, and reference modules
+  app.module.ts             Config, Prisma, auth, health, expense, reference, and debt modules
   configure-app.ts          /api prefix, global validation, exact-origin CORS
   config/                   Environment validation and database URL mapping/tests
   auth/                     Controller, session service, password hashing, guards, config/tests
@@ -39,6 +39,9 @@ src/
   finance/                  Decimal rules, serializable transactions, validation, safe error filter
   expenses/                 Controller, DTOs, transactional service, projection, and tests
   reference-data/           People/category/method creation/listing, DTOs, and tests
+  debts/                    Shared debt projection/validation, filters, lists, summaries, and tests
+  loans/                    Independent loan DTOs, controller, transactional service, and module
+  repayments/               Repayment DTOs, controller, transactional service, and module
   health/                   Health controller/service/module
 ```
 
@@ -56,7 +59,17 @@ Protected routes: `POST/GET /api/expenses`, `GET/PATCH/DELETE /api/expenses/:id`
 
 Expense writes and related allocations/debts use serializable interactive transactions with bounded whole-operation retries. No repayment row is rewritten or removed. Repayment history freezes debt principal/parties/date; incompatible corrections return 409. Delete changes only the parent flag; restore revalidates related financial records before reviving eligible children. Tests cover rollback/retry behavior with mocks, not real PostgreSQL concurrency.
 
-No migration was required. Before manual API writes, verify the configured connection against the intended Neon development branch in the console. The implementation's validation created no live database records and made no branch identity assertion. Do not use the real database as a fixture store. Current validation passes build/lint, 96 unit tests, and 70 API tests.
+No migration was required. Before manual API writes, verify the configured connection against the intended Neon development branch in the console. The implementation's validation created no live database records and made no branch identity assertion. Do not use the real database as a fixture store. Current backend validation passes build/lint, 135 unit tests, and 147 API tests, including the debt/loan/repayment suites.
+
+## Debts, loans and repayments
+
+See [debts-api.md](../docs/debts-api.md) for all 14 new routes, DTOs/examples, filtering, directional summaries, exact balances, history restrictions, retry contracts, errors and manual integration scenarios. Start the API with the same `npm run start:dev` configuration above; no new environment variables or migrations are required.
+
+`DebtsModule` provides protected debt lists, details and summaries; `LoansModule` manages `Debt(origin=LOAN)` and accepts explicit debtor/creditor IDs; `RepaymentsModule` records payments against either debt origin. All mutations inherit session/CSRF protection and the existing safe database error filter. Loans/repayments create no expense records and never net opposite obligations.
+
+Financial writes reuse the Serializable helper with three bounded attempts. Validation reloads source records and repayment history inside each transaction. Principal, counterparties and incurred date cannot change after any repayment history exists, including soft-deleted history. Deletion only marks the selected parent/repayment; restoration preserves independent flags and revalidates overpayment/source consistency. No immutable correction ledger is implemented.
+
+Lists/summaries scan candidate debts in batches within one snapshot; pagination bounds output rather than total work, and history can be large. This favors reusable Decimal rules for the private app; measure and optimize aggregates/history queries before larger-scale use. Tests verify simulated abort/retry/rollback behavior with a Prisma double, not genuine PostgreSQL contention. No isolated server was available and no live Neon records were created. Local URL target agreement was checked without exposing values, but the Neon branch name was not independently verified.
 
 ## Commands
 
@@ -89,7 +102,7 @@ Health returns `{ "status": "ok", "application": "Together Finance" }`. It remai
 
 ## Authentication
 
-Frontend integration added one backwards-compatible list parameter: `GET /api/expenses?deletionState=deleted` lists deleted records for recovery. Default `active` mode, filters, pagination, authentication, and financial-write rules remain unchanged. This addition requires no migration and passes backend lint/build, 96 unit tests, and 70 API tests.
+Frontend integration added one backwards-compatible list parameter: `GET /api/expenses?deletionState=deleted` lists deleted records for recovery. Default `active` mode, filters, pagination, authentication, and financial-write rules remain unchanged. This addition requires no migration.
 
 `GET /api/auth/session` returns authentication status, a CSRF token, and absolute expiry, creating a ten-minute anonymous bootstrap session if needed. `POST /api/auth/login` verifies the shared password, rotates the cookie/CSRF token, and creates an eight-hour session by default. `POST /api/auth/logout` immediately revokes that session and clears the cookie. POST requests require JSON, a configured Origin, and `X-CSRF-Token` from the session response.
 

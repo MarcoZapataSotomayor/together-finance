@@ -111,6 +111,7 @@ export function ExpenseSummary({
                     <dd>{formatDate(row.debt.incurredOn)}</dd>
                   </div>
                 </dl>
+                <a className="back-to-history" href={`#/debts/${row.debt.id}`}>Ver deuda y gestionar pagos</a>
                 {row.debt.repayments.length > 0 && (
                   <details>
                     <summary>

@@ -1,6 +1,6 @@
 # Expense and reference-data API
 
-The backend persists expenses, allocations, and expense-origin debts through Prisma 7.10.1. The frontend now uses these endpoints; see [frontend-expenses.md](frontend-expenses.md). Independent loans, repayment mutations, balances across expenses, and financial revision/audit workflows are outside this stage.
+The backend persists expenses, allocations, and expense-origin debts through Prisma 7.10.1. The frontend uses these endpoints; see [frontend-expenses.md](frontend-expenses.md). Independent loans, repayments and cross-expense debt summaries are documented separately in [debts-api.md](debts-api.md). Financial revision/audit workflows remain future work.
 
 All examples below are synthetic. Do not run them against a live database just to validate the code. Before any manual write, verify the branch in the Neon console and confirm that the locally configured connection belongs to the intended **development** branch. A database name or endpoint URL alone is not reliable evidence of branch identity. This implementation was validated with mocks, without verifying or writing to a configured Neon branch.
 
@@ -24,7 +24,7 @@ There are no individual authentication users. A person can be a beneficiary, fun
 
 ## Creating an expense and safe retries
 
-The caller must generate one UUID v4 **once per intended expense** (for example with `crypto.randomUUID()` in future frontend integration), retain it for retries, and submit it as `id`. Deliberately creating another expense requires a new UUID. This uses the existing expense primary key without a schema change.
+The caller must generate one UUID v4 **once per intended expense** (the frontend uses `crypto.randomUUID()`), retain it for retries, and submit it as `id`. Deliberately creating another expense requires a new UUID. This uses the existing expense primary key without a schema change.
 
 ```json
 {
@@ -143,7 +143,7 @@ All financial calculations use Prisma Decimal and the existing helpers. Largest-
 
 One expense/person allocation and one debt/source link remain reserved by the existing database unique constraints, including after deletion. Amendments reuse those records through upsert. Removed beneficiaries are soft-deleted; unpaid obsolete debts can become inactive or be reused for corrected terms. This preserves IDs/history links but is not a complete immutable revision log. No code physically deletes financial records or changes repayment rows.
 
-Existing repayment history, including soft-deleted repayments, freezes that debt's principal, counterparties, and incurrence date. The service first rejects removal/overpayment conflicts and also rejects other changes to these frozen terms with 409. Metadata and other shares may change only if historically repaid obligations retain their terms. Even an increase in an already repaid debt requires a future explicit correction workflow. This conservative policy follows the existing database-design contract instead of silently rewriting settled obligations. Repayment CRUD is not part of this task.
+Existing repayment history, including soft-deleted repayments, freezes that debt's principal, counterparties, and incurrence date. The service first rejects removal/overpayment conflicts and also rejects other changes to these frozen terms with 409. Metadata and other shares may change only if historically repaid obligations retain their terms. Even an increase in an already repaid debt requires a future explicit correction workflow. This conservative policy follows the existing database-design contract instead of silently rewriting settled obligations. Repayment creation/history/deletion/restoration and independent loans are documented in [debts-api.md](debts-api.md).
 
 ## Transactions and concurrency
 
@@ -151,7 +151,7 @@ Creation, amendment, soft deletion, and restoration execute entirely in Prisma i
 
 Prisma `P2034` serialization/deadlock conflicts retry the **whole operation**, at most three attempts with 20/40 ms delays. A retry reloads current repayments and references rather than using a stale pre-transaction balance. Creation additionally retries unique-key races to recheck the requested ID. Exhaustion returns 409; the caller must preserve the original creation ID. Allocation synchronization follows stable person-ID order, and database unique constraints prevent duplicate source debts. No in-process mutex or session-scoped PostgreSQL lock is used, so consistency is not limited to one Node process.
 
-Concurrent edits of the same expense serialize; after retry, a later successful absolute-field amendment wins for fields it explicitly supplied. This API has no optimistic version/If-Match contract. Other future financial writers, especially repayment creation/restoration, must follow the same serializable read/validate/write discipline. Direct SQL or noncompliant writers can bypass application invariants. People/payment-method name uniqueness is enforced by this API's serializable duplicate check; only categories currently have an additional SQL normalized-name index. No new indexes or schema changes were required.
+Concurrent edits of the same expense serialize; after retry, a later successful absolute-field amendment wins for fields it explicitly supplied. This API has no optimistic version/If-Match contract. Loan and repayment creation/restoration now follow the same serializable read/validate/write discipline, as future financial writers must. Direct SQL or noncompliant writers can bypass application invariants. People/payment-method name uniqueness is enforced by this API's serializable duplicate check; only categories currently have an additional SQL normalized-name index. No new indexes or schema changes were required.
 
 The strategy follows [Prisma 7 transaction guidance](https://www.prisma.io/docs/orm/v7/prisma-client/queries/transactions). Mock tests verify the wrapper's isolation options, bounded retries, fresh repayment checks, and rollback expectations; they cannot prove PostgreSQL SSI behavior, adapter error mapping under real contention, cross-process interleavings, or live unique-index behavior. Those require a disposable integration database, separate from the live Neon development/production databases.
 
@@ -178,6 +178,6 @@ Controller exception filters preserve intentional HTTP errors and replace databa
 
 Run backend `npm run prisma:validate`, `npm run prisma:generate` (also part of prebuild), `npm run lint`, `npm test`, `npm run test:e2e`, and `npm run build`. Test fixtures use only synthetic IDs/values and mock Prisma; no migration, reset, seed, live server startup, or database write is needed. The current CI workflow discovers the new test files automatically.
 
-Validation passed: lint without warnings, production build, **96 unit tests** and **70 API tests** including the existing suites. New tests cover personal/shared/third-party funding, exact cents, invalid/duplicate participants and references, safe creation replay, debt-link reuse, amendments, frozen repayment terms, soft deletion/restoration, pagination/filters, every route's authentication, mutation CSRF, whitelist rules, rollback expectations, and transaction conflicts.
+Expense-stage validation passed: lint without warnings, production build, **96 unit tests** and **70 API tests** including the earlier suites. Expense tests cover personal/shared/third-party funding, exact cents, invalid/duplicate participants and references, safe creation replay, debt-link reuse, amendments, frozen repayment terms, soft deletion/restoration, pagination/filters, every route's authentication, mutation CSRF, whitelist rules, rollback expectations, and transaction conflicts. The combined backend now passes **135 unit tests** and **147 API tests**, including [debt/loan/repayment validation](debts-api.md).
 
 No schema/migration files or dependency versions changed. No real database records were created during validation, and no live Neon branch identity/connectivity was asserted. Actual concurrent PostgreSQL integration testing and an immutable correction/audit workflow remain outstanding. Production session/cookie deployment limitations remain those documented in authentication.md. Measure query behavior against representative isolated data before adding indexes or changing pagination; this initial implementation bounds expense pages but includes related history.

@@ -67,7 +67,7 @@ Use curved ornamental corners and flourishes for Antonella/Shared, a scalloped S
 - `TextField` and `SelectField` provide native fields, labels, invalid states, and associated errors/hints.
 - `SegmentedControl` provides keyboard-accessible radio groups for card type, expense type, and allocation mode.
 - `StrawberrySprig`, `RibbonBow`, `CornerFlourish`, `FrameOrnaments`, `OrnamentalDivider`, and `ScallopedPanel` are original reusable decorative SVG components.
-- `ExpenseDetailsFields` handles visual field ordering without touching financial state; `AddPaymentMethod` handles session-only method creation; `NewExpenseScreen` composes the controlled prototype.
+- `ExpenseDetailsFields` handles visual ordering without changing financial state; `ReferenceEditor` persists explicitly created options; `NewExpenseScreen` composes the API-backed controlled form. History/detail screens reuse the frame, typography, tokens, and controls.
 - `expenseModel.ts` isolates validation, locale formatting, integer-cent parsing, and allocation calculations.
 
 ## Do's and Don'ts
@@ -75,7 +75,7 @@ Use curved ornamental corners and flourishes for Antonella/Shared, a scalloped S
 - Keep all interface copy in Spanish and implementation identifiers/comments in English.
 - Preserve the actual reference identities; do not return to a minimalist dashboard composition.
 - Keep required financial selections explicit. POV is never authentication, payer, owner, or proof of identity.
-- Persist only the POV preference in localStorage. Shared-password authentication uses a separate HttpOnly cookie; the expense prototype has no financial API calls, expense persistence, or financial filtering.
+- Persist only POV in localStorage. Authentication uses a separate HttpOnly cookie. Financial records come from the authenticated API; unsaved input remains in memory and never derives ownership from POV.
 - Keep decorative SVGs hidden from assistive technology and pointer input, and preserve at least 44 px touch targets.
 - Use visible focus and readable validation messages. Respect reduced-motion preferences.
 - Preserve sufficient text contrast, including on gradients. Do not solve density by shrinking editable text below 16 px.
