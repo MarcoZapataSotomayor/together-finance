@@ -1,0 +1,77 @@
+@layer components {
+  .finance-navigation { flex-wrap: wrap; width: fit-content; justify-content: center; }
+  .finance-navigation a { flex: 1 1 auto; padding-inline: 12px; }
+  .debt-frame { min-width: 0; padding-bottom: 112px; }
+  .debt-frame .title-plaque h1 { white-space: normal; text-align: center; font-size: clamp(1.7rem, 6.5vw, 2.8rem); }
+  .debt-frame .expense-title-wrap { margin-bottom: 28px; }
+  .debt-intro { max-width: 68ch; margin-block: 15px 24px; font-size: .93rem; color: var(--muted-text); }
+  .debt-page-actions { display: flex; flex-direction: column; gap: 8px; margin-bottom: 22px; align-items: start; }
+  .debt-page-actions .debt-intro { margin-bottom: 0; }
+  .debt-section-title, .debt-direction-panel > h2, .debt-parties { font-family: var(--heading-font); font-size: clamp(1.55rem, 5.5vw, 2rem); font-weight: 700; line-height: 1.25; color: var(--primary); margin-block: 24px 16px; overflow-wrap: anywhere; }
+  .debt-parties { font-family: var(--section-font); font-size: clamp(1.25rem, 5vw, 1.65rem); color: var(--text); }
+  .debt-pov-notice { position: relative; margin-block: 20px; padding: 14px 16px; border: 1px dashed var(--input-border); border-radius: var(--button-radius); background: var(--yellow); font-size: .85rem; }
+  .debt-mapping, .debt-breakdown { position: relative; margin-block: 16px; font-size: .88rem; }
+  .debt-mapping summary, .debt-breakdown summary { display: list-item; min-height: 44px; padding-block: 10px; cursor: pointer; color: var(--primary); font-weight: 650; }
+  .debt-filters { position: relative; padding-block: 8px 16px; border-block: 1px dashed var(--frame-edge); }
+  .debt-filter-disclosure { margin-block: 18px; border-block: 1px dashed var(--frame-edge); }
+  .debt-filter-disclosure > summary { min-height: 44px; padding-block: 12px; cursor: pointer; font-weight: 650; color: var(--primary); font-size: .9rem; }
+  .debt-form-grid { display: grid; gap: 20px; margin-block: 24px; }
+  .debt-wide { grid-column: 1 / -1; min-width: 0; }
+  .debt-directions { display: grid; gap: 28px; }
+  .debt-direction-panel { min-width: 0; }
+  .debt-total-strip { padding: 18px 16px; margin-block: 14px; background: var(--mint); border-radius: var(--button-radius); outline: 1px dashed var(--input-border); outline-offset: -6px; }
+  .debt-total-strip h3 { font-size: .86rem; font-weight: 650; }
+  .debt-total-strip > strong { display: block; font-size: clamp(1.3rem, 5vw, 1.8rem); color: var(--text); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; margin-block: 5px; }
+  .debt-total-strip p { color: var(--muted-text); font-size: .8rem; }
+  .debt-origin-totals { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--frame-edge); }
+  .debt-origin-totals dt, .debt-balances dt, .debt-entry-facts dt { color: var(--muted-text); font-size: .8rem; }
+  .debt-origin-totals dd { font-weight: 650; font-size: .9rem; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+  .debt-counterparties { display: grid; gap: 20px; padding-block: 14px; }
+  .debt-counterparties h3 { font-weight: 650; margin-bottom: 10px; color: var(--primary); }
+  .debt-counterparties dl > div { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 15px; padding-block: 8px; border-bottom: 1px dashed var(--frame-edge); overflow-wrap: anywhere; }
+  .debt-counterparties dd { font-weight: 650; font-variant-numeric: tabular-nums; }
+  .debt-list { list-style: none; padding: 0; margin: 0; }
+  .debt-list > li { padding-block: 24px; border-bottom: 1px solid var(--frame-edge); }
+  .debt-list article { min-width: 0; }
+  .debt-list h3 { font-size: 1.06rem; font-weight: 700; line-height: 1.45; overflow-wrap: anywhere; margin-block: 12px; }
+  .debt-list h3 a { text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--frame-edge); }
+  .debt-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-block: 10px; }
+  .debt-badges .badge { white-space: normal; max-width: 100%; }
+  .debt-description { color: var(--muted-text); font-size: .9rem; overflow-wrap: anywhere; white-space: pre-wrap; }
+  .debt-entry-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; margin-block: 15px; }
+  .debt-entry-facts dd { font-size: .9rem; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .debt-entry-facts > div:first-child { grid-column: 1 / -1; }
+  .debt-entry-facts > div:first-child dd { color: var(--primary); font-size: 1.25rem; font-weight: 700; }
+  .debt-result-count { margin-block: 20px 0; color: var(--muted-text); font-size: .82rem; }
+  .debt-balances { display: grid; gap: 12px; margin-block: 24px; padding-block: 16px; border-block: 1px dashed var(--frame-edge); }
+  .debt-balances dd { font-variant-numeric: tabular-nums; font-weight: 700; font-size: clamp(1.2rem, 4.5vw, 1.65rem); overflow-wrap: anywhere; }
+  .debt-balances > div:last-child { color: var(--primary); }
+  .debt-source { padding-block: 15px; font-size: .9rem; overflow-wrap: anywhere; }
+  .debt-source a { text-decoration: underline; color: var(--primary); text-underline-offset: 4px; }
+  .debt-payment-history { margin-top: 28px; }
+  .debt-payment-history > .form-field { max-width: 360px; }
+  .debt-save-button { background: linear-gradient(150deg, var(--save-end), var(--save-surface)) !important; color: var(--save-ink) !important; border: 1.5px solid var(--input-border) !important; box-shadow: inset 0 0 0 2px var(--frame-highlight), 0 3px 5px color-mix(in srgb, var(--text), transparent 85%); }
+  .debt-save-button:disabled { opacity: .6; box-shadow: none; }
+  .debt-frame input, .debt-frame textarea { caret-color: var(--primary); }
+  .debt-frame .workspace-actions a { min-height: 44px; }
+  .debt-frame .workspace-actions .button { max-width: 100%; }
+  [data-theme='marco'] .debt-section-title, [data-theme='marco'] .debt-list h3 { font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; }
+  [data-theme='marco'] .debt-total-strip { outline-style: solid; outline-width: 2px; background: var(--blue); }
+  [data-theme='shared'] .debt-total-strip { background: var(--mint); }
+  @media (min-width: 640px) {
+    .finance-navigation { margin-bottom: 115px; }
+    [data-theme='marco'] .finance-navigation { margin-bottom: 75px; }
+    .debt-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .debt-balances { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+    .debt-counterparties { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .debt-page-actions { flex-direction: row; align-items: center; justify-content: space-between; gap: 25px; }
+    .debt-page-actions > a { flex-shrink: 0; }
+  }
+  @media (min-width: 960px) {
+    .debt-directions-pair { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 36px; }
+    .debt-directions-pair .debt-counterparties { grid-template-columns: 1fr; }
+    .debt-directions-pair .debt-direction-panel + .debt-direction-panel { border-left: 1px dashed var(--frame-edge); padding-left: 28px; }
+    .debt-directions-pair .debt-origin-totals { grid-template-columns: 1fr; gap: 8px; }
+    .debt-form-grid { max-width: 850px; margin-inline: auto; }
+  }
+}

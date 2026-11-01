@@ -51,7 +51,7 @@ export async function apiRequest<T>(
             for (const message of error.message) {
               const field =
                 typeof message === 'string'
-                  ? /^(amount|purchasedOn|merchant|description|categoryId|paymentMethodId|fundedByPersonId|classification|allocations|id|name|type|ownerPersonId)\b/.exec(
+                  ? /^(amount|purchasedOn|merchant|description|categoryId|paymentMethodId|fundedByPersonId|classification|allocations|id|name|type|ownerPersonId|debtorPersonId|creditorPersonId|incurredOn|dueOn|paidOn)\b/.exec(
                       message,
                     )?.[1]
                   : undefined

@@ -25,12 +25,14 @@ export function ReferenceEditor({
   references,
   onCreated,
   onCancel,
+  idPrefix = 'reference',
 }: {
   kind: ReferenceKind
   api: FinanceApi
   references: References
   onCreated: (kind: ReferenceKind, record: CreatedReference) => void
   onCancel: () => void
+  idPrefix?: string
 }) {
   const [name, setName] = useState('')
   const [type, setType] = useState<PaymentMethodType | ''>('')
@@ -78,7 +80,7 @@ export function ReferenceEditor({
   return (
     <section
       className="add-payment-panel reference-editor"
-      aria-labelledby="reference-title"
+      aria-labelledby={`${idPrefix}-title`}
       onKeyDown={(event) => {
         if (event.key === 'Enter' && event.target instanceof HTMLInputElement) {
           event.preventDefault()
@@ -86,17 +88,17 @@ export function ReferenceEditor({
         }
       }}
     >
-      <h2 id="reference-title">{labels[kind]}</h2>
+      <h2 id={`${idPrefix}-title`}>{labels[kind]}</h2>
       <p className="field-hint">
         Se guardará para los dos. Crear una persona no le asigna un consumo ni
         la convierte en una cuenta de acceso.
       </p>
       <fieldset disabled={busy} className="plain-fieldset">
         <div className="form-field">
-          <label htmlFor="reference-name">Nombre</label>
+          <label htmlFor={`${idPrefix}-name`}>Nombre</label>
           <input
             ref={input}
-            id="reference-name"
+            id={`${idPrefix}-name`}
             value={name}
             onChange={(event) => setName(event.target.value)}
             maxLength={120}
@@ -105,7 +107,7 @@ export function ReferenceEditor({
         {kind === 'methods' && (
           <>
             <SelectField
-              id="reference-type"
+              id={`${idPrefix}-type`}
               label="Tipo de medio de pago"
               value={type}
               onChange={(event) =>
@@ -120,7 +122,7 @@ export function ReferenceEditor({
               ))}
             </SelectField>
             <SelectField
-              id="reference-owner"
+              id={`${idPrefix}-owner`}
               label="Titular registrado (opcional)"
               value={owner}
               onChange={(event) => setOwner(event.target.value)}

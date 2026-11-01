@@ -26,10 +26,12 @@ export function ApiFeedback({
   error,
   context = 'read',
   onRetry,
+  errorMessage,
 }: {
   error: unknown
   context?: Parameters<typeof financeError>[1]
   onRetry?: () => void
+  errorMessage?: string
 }) {
   const { refreshSession } = useAuth()
   const lock = useRef(false)
@@ -53,7 +55,7 @@ export function ApiFeedback({
   }
   return (
     <div className="form-message error-summary workspace-error" role="alert">
-      <p>{financeError(error, context)}</p>
+      <p>{errorMessage ?? financeError(error, context)}</p>
       {message && <p>{message}</p>}
       <div className="workspace-actions">
         {error instanceof ApiError && error.status === 403 && (
