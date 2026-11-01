@@ -2,7 +2,7 @@
 
 ## Scope and boundaries
 
-The database stores financial people, not authentication accounts. Antonella, Marco, and external people such as a parent can be debtors, creditors, funders, or beneficiaries. POV never supplies these identities. Every financial operation must explicitly select stable person IDs. Shared-password authentication uses separate process-local sessions without changing this schema. Financial CRUD endpoints remain a future stage.
+The database stores financial people, not authentication accounts. Antonella, Marco, and external people such as a parent can be debtors, creditors, funders, or beneficiaries. POV never supplies these identities. Every financial operation must explicitly select stable person IDs. Shared-password authentication uses separate process-local sessions without changing this schema. Protected expense/reference endpoints now reuse this schema; see [expenses-api.md](expenses-api.md). Loan/repayment endpoints remain a future stage.
 
 The initial migration is `20261031170000_initial_financial_schema`. Before application, read-only inspection confirmed both Neon connections worked and there were no application tables, migrations, custom types, routines, or extra schemas. The reviewed migration creates seven application tables, four enums, restrictive foreign keys, indexes, and checks. It inserts no business data. Post-migration verification found all seven tables empty.
 
@@ -87,7 +87,7 @@ Prisma cannot express the expression index or these CHECK constraints directly i
 
 ## Invariants requiring transactional services
 
-The current pure helpers validate financial examples, but do not execute writes or establish transaction safety. Future services must enforce the following within short database transactions:
+The pure helpers validate financial examples, but do not execute writes or establish transaction safety themselves. Expense services now reuse them inside short serializable interactive transactions, with bounded whole-operation retries. These services and future financial writers must enforce the following:
 
 1. Resolve explicit, existing, eligible people/category/method IDs. A POV value is never a financial default.
 2. Validate unrounded money and percentages before PostgreSQL coerces their scale.
@@ -97,7 +97,7 @@ The current pure helpers validate financial examples, but do not execute writes 
 6. Apply the same concurrency discipline to all source edits, deletion/restoration, and repayment writers. Lock source expenses, allocations, then debts in a consistent order, sorting multiple IDs. Alternatively, consistently use serializable interactive transactions with bounded retries for Prisma `P2034` conflicts. Do not rely on a prior out-of-transaction balance read.
 7. Reject financial source/principal changes with repayment history until an explicit correction/revision workflow exists. No silent rewrite of settled obligations is allowed. Recheck all child invariants before restoring a parent.
 
-No database trigger currently serializes repayments or enforces allocation aggregates. Unit/API tests do **not** prove concurrent write safety. There are no CRUD services that bypass this boundary in this stage. Future integration/concurrency tests need a separate disposable database, never fake financial rows in the live database.
+No database trigger currently serializes repayments or enforces allocation aggregates. Unit/API tests do **not** prove concurrent write safety. Expense/reference writes use the serializable transaction boundary; future repayment writers must follow it too. Tests verify retry/rollback/revalidation expectations with mocks. Real integration/concurrency tests need a separate disposable database, never fake financial rows in the live database.
 
 ## Prisma 7 configuration and lifecycle
 
@@ -143,4 +143,4 @@ Restore a backup first into an isolated database/branch, verify migration histor
 
 Initial validation: schema valid; Prisma Client 7.10.1 generated; migration applied and up to date; all seven business tables empty; ten restricted/indexed FKs; twelve CHECKs; category expression index present; pooled Prisma reads successful; Nest startup/health HTTP 200 successful. Tests cover allocation and debt rules in isolation; API tests mock Prisma and do not read local Neon.
 
-Authentication, CRUD, correction history, runtime least-privilege role provisioning, and concurrency-tested transaction services remain future work. The frontend is unchanged. No existing database data was deleted.
+Shared authentication and transactional expense/reference endpoints are implemented without additional schema changes. Loan/repayment endpoints, correction history, runtime least-privilege role provisioning, and real PostgreSQL concurrency verification remain future work. The frontend is unchanged. Expense validation uses mocks and created no live records; it did not independently verify Neon branch identity. No existing database data was deleted.

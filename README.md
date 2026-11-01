@@ -1,6 +1,6 @@
 ﻿# Together Finance
 
-A private application to track personal/shared expenses, loans, debts, and repayments. The repository contains a React visual prototype and a NestJS API with shared-password authentication and a Prisma 7 / Neon PostgreSQL foundation. Financial CRUD endpoints remain a future stage. Frontend POV is a visual context, never proof of identity or financial ownership.
+A private application to track personal/shared expenses, loans, debts, and repayments. The repository contains a React visual prototype and a NestJS API with shared-password authentication, expense management, financial reference data, and a Prisma 7 / Neon PostgreSQL foundation. Loan/repayment endpoints and frontend financial API integration remain future stages. Frontend POV is a visual context, never proof of identity or financial ownership.
 
 ## Requirements and structure
 
@@ -12,6 +12,7 @@ Use Node.js 24.x and npm (verified with Node 24.18.0 and npm 11.16.0). The front
 - `docs/database-design.md`: relational model, money/debt rules, transactions, migrations, and restoration policy.
 - `docs/authentication.md`: shared-password setup, sessions, CSRF, tests, and deployment limits.
 - `docs/ci-cd.md`: GitHub Actions CI, local reproduction, and future delivery concepts.
+- `docs/expenses-api.md`: protected expense/reference endpoints, examples, transactions, and repayment safeguards.
 
 ## Start the frontend
 
@@ -83,7 +84,7 @@ The root `.gitignore` excludes `.env` and `.env.*` while allowing `.env.example`
 
 ## Backend architecture and checks
 
-`AppModule` loads configuration, `PrismaModule`, `AuthModule`, and `HealthModule`. The singleton `PrismaService` uses the PostgreSQL driver adapter and a bounded pool. Global authentication guards protect routes unless explicitly marked public; health, session bootstrap, and login are public. `configure-app.ts` applies the global `/api` prefix, exact-origin credentialed CORS, and DTO validation. Future request DTOs must use validation decorators for their allowed properties.
+`AppModule` loads configuration, `PrismaModule`, `AuthModule`, `HealthModule`, `ExpensesModule`, and `ReferenceDataModule`. The singleton `PrismaService` uses the PostgreSQL driver adapter and a bounded pool. Global authentication guards protect routes unless explicitly marked public; health, session bootstrap, and login are public. `configure-app.ts` applies the global `/api` prefix, exact-origin credentialed CORS, and DTO validation. Future request DTOs must use validation decorators for their allowed properties.
 
 From `backend/`:
 
@@ -113,6 +114,6 @@ GitHub Actions runs independent **Frontend** and **Backend** CI jobs for PRs tar
 - **Render backend:** root directory `backend`, build command `npm ci --include=dev && npm run build`, start command `npm run start:prod`. Use Node 24.x, set `NODE_ENV=production`, set `CORS_ORIGINS` to the exact deployed frontend origin, and use `/api/health` as the health-check path. Render supplies `PORT`; the API binds to `0.0.0.0`.
 - **Neon PostgreSQL:** Prisma 7 is integrated. Apply reviewed migrations from a trusted migration environment using the direct connection before deploying the API. Runtime uses the pooled connection. Never run migrations automatically on API startup or put a database URL in a `VITE_` variable.
 
-These are configuration instructions, not completed deployments. Configure the required authentication keys as private backend environment variables. The current session/rate-limit store supports **one backend instance**; restart or redeployment ends all sessions. For reliable cookies, prefer a same-origin `/api` reverse proxy or HTTPS subdomains under the same registrable domain. Separate `vercel.app` / `onrender.com` domains require `SameSite=None; Secure`, and browsers can still block their third-party cookies. See [authentication deployment options](docs/authentication.md#production-deployment) before deploying. Financial business endpoints do not exist yet.
+These are configuration instructions, not completed deployments. Configure the required authentication keys as private backend environment variables. The current session/rate-limit store supports **one backend instance**; restart or redeployment ends all sessions. For reliable cookies, prefer a same-origin `/api` reverse proxy or HTTPS subdomains under the same registrable domain. Separate `vercel.app` / `onrender.com` domains require `SameSite=None; Secure`, and browsers can still block their third-party cookies. See [authentication deployment options](docs/authentication.md#production-deployment) before deploying. Expense/reference endpoints are implemented; verify the intended development database before manual writes and read [expense safeguards](docs/expenses-api.md).
 
 See the [frontend documentation](frontend/README.md) for the visual prototype and [backend documentation](backend/README.md) for the API structure and audit findings.
