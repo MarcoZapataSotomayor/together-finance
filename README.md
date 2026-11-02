@@ -21,6 +21,7 @@ Use Node.js 24.x and npm (verified with Node 24.18.0 and npm 11.16.0). The front
 - `docs/production-readiness.md`: security findings, genuine PostgreSQL tests, deployment prerequisites and unresolved release gates.
 - `docs/backup-restore.md`: protected long-term backups, isolated restoration, verification and recovery restrictions.
 - `docs/motion-design.md`: shared motion tokens, theme-specific feedback, reduced-motion behavior and browser validation.
+- `docs/staging-deployment.md`: isolated Vercel/Render/Neon staging configuration, safety guards and pending hosted verification. No deployment is enabled by this preparation.
 
 ## Start the frontend
 

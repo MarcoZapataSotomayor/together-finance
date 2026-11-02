@@ -60,6 +60,8 @@ The workflow adds database-safety tests and the scoped repository check, retains
 
 ## Render and Vercel preparation
 
+For the isolated staging procedure, use [staging deployment](staging-deployment.md). The checked-in `frontend/vercel.json` is staging-only and deliberately refuses an unconfigured target. `render.staging.yaml` disables automatic deployments and must be selected explicitly; creating a Blueprint still initiates its first deployment. The older generic Vercel example below remains inactive and is not the staging configuration.
+
 | Setting | Frontend / Vercel | Backend / Render |
 | --- | --- | --- |
 | Root directory | `frontend` | `backend` |
