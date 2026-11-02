@@ -6,3 +6,12 @@ coverage/
 .env.*
 !.env.example
 *.log
+backups/
+*.dump
+*.backup
+*.tfbackup
+*.tfbackup.json
+*.dump.json
+*.sql.gz
+*.dump.gpg
+*.dump.7z
