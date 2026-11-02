@@ -122,6 +122,12 @@ Installation reported the existing 12 frontend and two backend moderate audit fi
 
 ## Future production delivery
 
+### Current database-safety addition
+
+The backend job now starts a digest-pinned official PostgreSQL 17 service and runs `npm run test:safety`, `npm run check:repository` and `npm run test:postgres`. These additions use only disposable runner-local credentials. The runner creates a unique test database, applies the existing migration and verifies real concurrent financial operations plus an actual isolated pg_dump/pg_restore round trip. It never resets or truncates tables, connects to Neon, uploads backup artifacts or runs production migrations. The service is discarded with the job. Local checks passed all 10 PostgreSQL tests through both self-managed-container and externally supplied CI-service modes; hosted Ubuntu execution remains to be verified after the user submits a qualifying PR/push. See [production readiness](production-readiness.md) and [backup/restore](backup-restore.md).
+
+Update the PostgreSQL image digest through reviewed dependency maintenance, keeping the local runner and service definition aligned. Cancellation can interrupt the runner's normal cleanup, but GitHub removes the disposable service with the job. Locally, inspect the uniquely labeled test container if the process is forcibly terminated; never prune unrelated Docker resources. The added service/checks consume the existing job's runner minutes and introduce no paid cloud database.
+
 A later delivery pipeline can depend on successful CI and deploy reviewed versions to Vercel and Render. It should introduce scoped deployment credentials or supported short-lived identity, protected GitHub environments, explicit production approval where desired, deployed health checks, and rollback procedures. PR validation must remain separate from secret-bearing deployment jobs.
 
 Build artifacts or immutable version identifiers can ensure that the deployed revision matches what passed CI. Production configuration will include real backend secrets and database connections supplied through the host's secret management, never the test fixtures or frontend build variables. Database migrations will need their own reviewed, controlled execution with backup/recovery planning; they must not be added casually to this validation workflow. Authentication's single-instance session and production cookie constraints still apply; see [authentication.md](authentication.md).

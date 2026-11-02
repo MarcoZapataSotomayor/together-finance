@@ -1,7 +1,11 @@
 import { spawn } from 'node:child_process';
 import { config } from 'dotenv';
+import { allowedPrismaCommand } from './database-safety.mjs';
 
 config({ quiet: true });
+
+try { allowedPrismaCommand(process.argv.slice(2), process.env); }
+catch (error) { console.error(error.message); process.exit(1); }
 
 // Redact connection strings and their identifying components before CLI output.
 const secrets = [];
