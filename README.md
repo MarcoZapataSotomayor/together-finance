@@ -17,6 +17,7 @@ Use Node.js 24.x and npm (verified with Node 24.18.0 and npm 11.16.0). The front
 - `docs/frontend-expenses.md`: API-backed form/history, reference setup, draft recovery, and validation.
 - `docs/frontend-debts.md`: debt/loan/payment screens, directional POV defaults, exact amounts, retry recovery, browser validation and limitations.
 - `docs/analytics.md`: exact spending analytics, monthly/category analysis, funding versus allocation, themed dashboard, tests and limits.
+- `docs/data-management.md`: protected CSV formats, filtered exports, centralized recovery, permanent-deletion restrictions, resource limits and validation.
 
 ## Start the frontend
 
@@ -31,6 +32,8 @@ npm run dev
 Open the URL printed by Vite, normally `http://localhost:5173`. If Vite chooses another port, add that exact frontend origin to the backend's `CORS_ORIGINS` value.
 
 After authentication, `#/dashboard` is the default home. Resumen displays actual monthly/range spending, categories, trends, contributions, recent expenses and current debts. Current debt obligations cover all dates and are kept separate from the selected spending period. No income or available-bank-balance feature is implemented.
+
+**Exportar** (`#/exports`) downloads explicitly scoped financial CSV files. **Eliminados** (`#/recycle-bin`) filters directly deleted expenses, loans and repayments and restores them through the existing financial checks. Permanent deletion remains unavailable to preserve history and idempotency. See [data management](docs/data-management.md) for endpoints, security, limits and the validation checklist.
 
 ## Start the API
 

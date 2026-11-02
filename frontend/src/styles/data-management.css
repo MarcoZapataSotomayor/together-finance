@@ -1,0 +1,144 @@
+@layer components {
+  .data-management {
+    position: relative;
+    min-width: 0;
+  }
+  .data-filter-grid {
+    display: grid;
+    gap: 20px;
+    margin-block: 22px;
+  }
+  .data-filter-grid > * {
+    min-width: 0;
+  }
+  .data-filter-note {
+    align-self: center;
+    color: var(--muted-text);
+    font-size: 0.85rem;
+  }
+  .data-filter-note p + p {
+    margin-top: 8px;
+  }
+  .data-explanation {
+    border-top: 1px dashed var(--frame-edge);
+    margin-top: 32px;
+    padding-top: 22px;
+    max-width: 75ch;
+  }
+  .data-explanation h2 {
+    font-family: var(--section-font);
+    font-size: clamp(1.2rem, 4vw, 1.5rem);
+    color: var(--primary);
+    margin-bottom: 12px;
+  }
+  .data-explanation p {
+    color: var(--muted-text);
+    font-size: 0.88rem;
+    margin-block: 10px;
+  }
+  .data-bin-filters {
+    border-bottom: 1px dashed var(--frame-edge);
+  }
+  .data-result-count {
+    color: var(--muted-text);
+    margin-block: 24px 6px;
+    font-size: 0.9rem;
+  }
+  .data-bin-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .data-bin-entry {
+    padding-block: 24px;
+    border-bottom: 1px dashed var(--frame-edge);
+    overflow-wrap: anywhere;
+  }
+  .data-entry-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .data-entry-heading strong {
+    font-variant-numeric: tabular-nums;
+    font-size: clamp(1.15rem, 4vw, 1.45rem);
+  }
+  .data-bin-entry h2 {
+    font-family: var(--section-font);
+    font-size: 1.15rem;
+    margin-block: 14px;
+    line-height: 1.45;
+  }
+  .data-bin-entry a {
+    color: var(--primary);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .data-entry-dates {
+    display: grid;
+    gap: 12px;
+    margin-block: 16px;
+  }
+  .data-entry-dates dt {
+    color: var(--muted-text);
+    font-size: 0.8rem;
+  }
+  .data-entry-dates dd {
+    font-size: 0.92rem;
+  }
+  .data-entry-people {
+    list-style: none;
+    padding: 0;
+    font-size: 0.9rem;
+    margin-block: 16px;
+  }
+  .data-entry-people span {
+    color: var(--muted-text);
+  }
+  .data-pagination {
+    margin-block: 24px;
+    gap: 16px;
+    justify-content: center;
+  }
+  .data-pagination > span {
+    font-size: 0.85rem;
+  }
+  @media (min-width: 640px) {
+    .data-filter-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .data-entry-dates {
+      grid-template-columns: 1fr 1fr;
+    }
+    .data-bin-filters .workspace-actions {
+      align-self: end;
+    }
+  }
+  @media (min-width: 1000px) {
+    .data-management {
+      max-width: 900px;
+      margin-inline: auto;
+    }
+    .data-bin-entry {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(180px, 0.7fr);
+      column-gap: 36px;
+    }
+    .data-bin-entry > .data-entry-heading,
+    .data-bin-entry > h2,
+    .data-bin-entry > .field-hint {
+      grid-column: 1 / -1;
+    }
+    .data-bin-entry > .workspace-actions {
+      grid-column: 1 / -1;
+    }
+    .data-entry-dates {
+      margin-top: 0;
+    }
+    .data-entry-people {
+      margin-top: 0;
+    }
+  }
+}
