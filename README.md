@@ -18,6 +18,8 @@ Use Node.js 24.x and npm (verified with Node 24.18.0 and npm 11.16.0). The front
 - `docs/frontend-debts.md`: debt/loan/payment screens, directional POV defaults, exact amounts, retry recovery, browser validation and limitations.
 - `docs/analytics.md`: exact spending analytics, monthly/category analysis, funding versus allocation, themed dashboard, tests and limits.
 - `docs/data-management.md`: protected CSV formats, filtered exports, centralized recovery, permanent-deletion restrictions, resource limits and validation.
+- `docs/production-readiness.md`: security findings, genuine PostgreSQL tests, deployment prerequisites and unresolved release gates.
+- `docs/backup-restore.md`: protected long-term backups, isolated restoration, verification and recovery restrictions.
 
 ## Start the frontend
 

@@ -30,7 +30,12 @@
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
     "test:debug": "vitest --inspect-brk --no-file-parallelism",
-    "test:e2e": "vitest run --config ./vitest.config.e2e.ts"
+    "test:e2e": "vitest run --config ./vitest.config.e2e.ts",
+    "test:postgres": "node scripts/run-postgres-tests.mjs",
+    "test:safety": "node --test scripts/*.test.mjs",
+    "check:repository": "node scripts/check-repository-safety.mjs",
+    "db:backup": "node scripts/backup-restore.mjs backup",
+    "db:restore:isolated": "node scripts/backup-restore.mjs restore"
   },
   "dependencies": {
     "@nestjs/common": "^12.3.2",

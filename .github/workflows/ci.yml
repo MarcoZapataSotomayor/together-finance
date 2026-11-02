@@ -51,11 +51,25 @@ jobs:
     name: Backend
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17@sha256:3b0cda93be7c8dba2ed484d19393d93845dc3dafb88973e248ba8e6d99d784e1
+        env:
+          POSTGRES_USER: together_test
+          POSTGRES_PASSWORD: ci-disposable-only
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U together_test -d postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     defaults:
       run:
         working-directory: backend
     env:
-      # Tests supply synthetic configuration and mock the database provider.
+      # Unit/API tests mock Prisma; integration uses this job's disposable service.
       NODE_ENV: test
 
     steps:
@@ -88,6 +102,20 @@ jobs:
 
       - name: Run API tests
         run: npm run test:e2e
+
+      - name: Test database safety gates
+        run: npm run test:safety
+
+      - name: Check repository for environment and backup exposure
+        run: npm run check:repository
+
+      - name: Run isolated PostgreSQL and restore checks
+        run: npm run test:postgres
+        env:
+          # Synthetic credentials for this runner's disposable service only.
+          TF_DISPOSABLE_POSTGRES: '1'
+          TEST_POSTGRES_ADMIN_URL: postgresql://together_test:ci-disposable-only@127.0.0.1:5432/postgres
+          PG_TOOLS_CONTAINER: ${{ job.services.postgres.id }}
 
       - name: Build production backend
         run: npm run build

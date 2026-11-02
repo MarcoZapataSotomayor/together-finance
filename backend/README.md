@@ -61,7 +61,15 @@ Protected routes: `POST/GET /api/expenses`, `GET/PATCH/DELETE /api/expenses/:id`
 
 Expense writes and related allocations/debts use serializable interactive transactions with bounded whole-operation retries. No repayment row is rewritten or removed. Repayment history freezes debt principal/parties/date; incompatible corrections return 409. Delete changes only the parent flag; restore revalidates related financial records before reviving eligible children. Tests cover rollback/retry behavior with mocks, not real PostgreSQL concurrency.
 
-No migration was required. Before manual API writes, verify the configured connection against the intended Neon development branch in the console. The implementation's validation created no live database records and made no branch identity assertion. Do not use the real database as a fixture store. Current backend validation passes build/lint/schema validation, 169 unit tests, and 178 API tests, including debt/loan/repayment, analytics and data-management suites.
+No migration was required. Before manual API writes, verify the configured connection against the intended Neon development branch in the console. Do not use the real database as a fixture store. Current backend validation passes build/lint/schema validation, 174 unit tests and 180 API tests, plus the genuine isolated PostgreSQL checks described below. No existing Neon data was modified during this stage.
+
+## Production safety and isolated PostgreSQL tests
+
+Run `npm run test:postgres` with Docker available. It creates a localhost-only temporary PostgreSQL 17 cluster, applies the existing migration to a unique disposable database and runs 10 real concurrency/integrity/backup-restore tests. It never loads a Neon target, resets or truncates a database. In CI it uses the job's own PostgreSQL service. `npm run test:safety` runs 3 script-safety tests; `npm run check:repository` checks for scoped environment/backup/credential exposure without printing values.
+
+The real tests exposed and now cover an adapter commit-time conflict missing the previous P2034 retry path. The same bounded Serializable strategy handles that specific conflict; no financial schema or authentication redesign was introduced. API headers and a 32 KiB JSON limit provide additional focused protections.
+
+`npm run db:backup` requires an explicit direct source and protected encrypted storage; the archive itself is not encrypted by the script. `npm run db:restore:isolated -- <archive>` accepts only a new disposable loopback target. Read [backup-restore.md](../docs/backup-restore.md) before use. Migration deploy now requires explicit target/host/database/approval settings in addition to the direct connection; see [production-readiness.md](../docs/production-readiness.md). Do not put migrations in build/start commands. This stage does not deploy or certify production readiness.
 
 ## Data management
 

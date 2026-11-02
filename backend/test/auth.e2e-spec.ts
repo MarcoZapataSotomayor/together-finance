@@ -335,6 +335,9 @@ describe('shared-password authentication (e2e)', () => {
     expect(flags.includes('Secure')).toBe(true);
     expect(flags.includes('HttpOnly')).toBe(true);
     expect(flags.includes('SameSite=None')).toBe(true);
+    expect(response.headers['strict-transport-security']).toBe(
+      'max-age=31536000',
+    );
     expect(flags.includes('Domain=')).toBe(false);
   });
 
@@ -346,5 +349,27 @@ describe('shared-password authentication (e2e)', () => {
       .get('/api/private-probe')
       .set('Cookie', session.cookie)
       .expect(401);
+  });
+
+  it('sets restrictive API headers on public and denied financial responses', async () => {
+    for (const path of ['/api/health', '/api/expenses']) {
+      const response = await request(app.getHttpServer()).get(path);
+      expect(response.headers['x-powered-by']).toBeUndefined();
+      expect(response.headers['x-content-type-options']).toBe('nosniff');
+      expect(response.headers['x-frame-options']).toBe('DENY');
+      expect(response.headers['referrer-policy']).toBe('no-referrer');
+      expect(response.headers['content-security-policy']).toContain(
+        "default-src 'none'",
+      );
+      expect(response.headers['cache-control']).toBe('no-store');
+      expect(response.headers['strict-transport-security']).toBeUndefined();
+    }
+  });
+
+  it('rejects oversized JSON before hashing or financial processing', async () => {
+    await request(app.getHttpServer())
+      .post('/api/auth/login')
+      .send({ password: 'x'.repeat(33000) })
+      .expect(413);
   });
 });
