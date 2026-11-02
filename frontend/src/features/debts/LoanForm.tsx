@@ -4,6 +4,7 @@ import type { DebtApi, DebtRecord } from '../../api/debts'
 import type { FinanceApi } from '../../api/finance'
 import type { References } from '../../api/types'
 import { Button } from '../../components/ui/Button'
+import { ConfirmedMark } from '../../components/ui/ConfirmedMark'
 import { SelectField, TextField } from '../../components/ui/FormField'
 import { LoadingNotice } from '../expenses/ApiFeedback'
 import { localDate } from '../expenses/expenseModel'
@@ -69,6 +70,7 @@ export function LoanForm({
   const form = useRef<HTMLFormElement>(null),
     lock = useRef(false)
   const frozen = !!record?.repayments.length
+  const confirmation = useRef<HTMLDivElement>(null)
   const people = references.people.filter((row) => row.isActive)
   const set = (field: keyof LoanValues, value: string) =>
     drafts.updateLoan(key, { ...values, [field]: value })
@@ -76,6 +78,7 @@ export function LoanForm({
     setSaved(result)
     drafts.clear(key)
     onChanged()
+    requestAnimationFrame(() => confirmation.current?.focus())
   }
   async function save(event: FormEvent) {
     event.preventDefault()
@@ -150,8 +153,8 @@ export function LoanForm({
         {record ? 'Volver al préstamo' : 'Ver préstamos'}
       </a>
       {saved ? (
-        <div className="workspace-empty">
-          <h2>{record ? 'Cambios guardados' : 'Préstamo guardado'}</h2>
+        <div className="workspace-empty" ref={confirmation} tabIndex={-1}>
+          <h2 className="motion-confirmed-heading"><ConfirmedMark />{record ? 'Cambios guardados' : 'Préstamo guardado'}</h2>
           <p role="status">
             El servidor confirmó el préstamo. No cuenta como un gasto.
           </p>

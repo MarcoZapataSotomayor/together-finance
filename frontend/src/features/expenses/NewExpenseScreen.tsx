@@ -10,6 +10,7 @@ import {
   ScallopedPanel,
 } from '../../components/decorations/Ornaments'
 import { Button } from '../../components/ui/Button'
+import { ConfirmedMark } from '../../components/ui/ConfirmedMark'
 import { SelectField, TextField } from '../../components/ui/FormField'
 import { Icon } from '../../components/ui/Icon'
 import { SegmentedControl } from '../../components/ui/SegmentedControl'
@@ -74,6 +75,15 @@ export function NewExpenseScreen({
   const lock = useRef(false)
   const errorSummary = useRef<HTMLDivElement>(null)
   const confirmation = useRef<HTMLDivElement>(null)
+  const editorTrigger = useRef<HTMLElement | null>(null)
+  function openEditor(kind: ReferenceKind) {
+    editorTrigger.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    setEditor(kind)
+  }
+  function closeEditor() {
+    setEditor(null)
+    requestAnimationFrame(() => editorTrigger.current?.focus({ preventScroll: true }))
+  }
   const prefix = initialExpense ? 'edit' : 'new'
   const payment =
     references.methods.find((method) => method.id === values.paymentMethodId) ??
@@ -296,7 +306,7 @@ export function NewExpenseScreen({
       >
         {saved && (
           <>
-            <Icon name="check" />
+            <ConfirmedMark />
             <div>
               <p>
                 Consumo guardado: {penFormatter.format(Number(saved.amount))} en{' '}
@@ -333,7 +343,7 @@ export function NewExpenseScreen({
                 key={kind}
                 variant="ghost"
                 disabled={busy || uncertain || !ready}
-                onClick={() => setEditor(kind)}
+                onClick={() => openEditor(kind)}
               >
                 {kind === 'people'
                   ? 'Agregar persona'
@@ -359,7 +369,7 @@ export function NewExpenseScreen({
           api={api}
           references={references}
           onCreated={referenceCreated}
-          onCancel={() => setEditor(null)}
+          onCancel={closeEditor}
         />
       )}
       <fieldset disabled={disabled} className="plain-fieldset">
@@ -403,7 +413,7 @@ export function NewExpenseScreen({
                   className="add-method-button"
                   type="button"
                   aria-label="Agregar medio de pago"
-                  onClick={() => setEditor('methods')}
+                  onClick={() => openEditor('methods')}
                 >
                   <Icon name="plus" />
                 </button>
