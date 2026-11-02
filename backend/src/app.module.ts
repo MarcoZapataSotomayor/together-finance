@@ -10,6 +10,7 @@ import { DebtsModule } from './debts/debts.module.js';
 import { LoansModule } from './loans/loans.module.js';
 import { RepaymentsModule } from './repayments/repayments.module.js';
 import { AnalyticsModule } from './analytics/analytics.module.js';
+import { DataManagementModule } from './data-management/data-management.module.js';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { AnalyticsModule } from './analytics/analytics.module.js';
     LoansModule,
     RepaymentsModule,
     AnalyticsModule,
+    DataManagementModule,
     HealthModule,
   ],
 })

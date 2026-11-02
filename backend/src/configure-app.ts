@@ -29,5 +29,6 @@ export function configureApp(app: INestApplication): void {
       ),
     credentials: true,
     allowedHeaders: ['Content-Type', 'X-CSRF-Token'],
+    exposedHeaders: ['Content-Disposition'],
   });
 }

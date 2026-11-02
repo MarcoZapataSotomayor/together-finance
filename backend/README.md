@@ -39,6 +39,7 @@ src/
   finance/                  Decimal rules, serializable transactions, validation, safe error filter
   expenses/                 Controller, DTOs, transactional service, projection, and tests
   analytics/                Protected read-only spending aggregation, exact cents, DTOs, and tests
+  data-management/          Bounded CSV exports, unified recycle bin, DTOs, and tests
   reference-data/           People/category/method creation/listing, DTOs, and tests
   debts/                    Shared debt projection/validation, filters, lists, summaries, and tests
   loans/                    Independent loan DTOs, controller, transactional service, and module
@@ -60,7 +61,11 @@ Protected routes: `POST/GET /api/expenses`, `GET/PATCH/DELETE /api/expenses/:id`
 
 Expense writes and related allocations/debts use serializable interactive transactions with bounded whole-operation retries. No repayment row is rewritten or removed. Repayment history freezes debt principal/parties/date; incompatible corrections return 409. Delete changes only the parent flag; restore revalidates related financial records before reviving eligible children. Tests cover rollback/retry behavior with mocks, not real PostgreSQL concurrency.
 
-No migration was required. Before manual API writes, verify the configured connection against the intended Neon development branch in the console. The implementation's validation created no live database records and made no branch identity assertion. Do not use the real database as a fixture store. Current backend validation passes build/lint/schema validation, 149 unit tests, and 161 API tests, including the debt/loan/repayment and analytics suites.
+No migration was required. Before manual API writes, verify the configured connection against the intended Neon development branch in the console. The implementation's validation created no live database records and made no branch identity assertion. Do not use the real database as a fixture store. Current backend validation passes build/lint/schema validation, 169 unit tests, and 178 API tests, including debt/loan/repayment, analytics and data-management suites.
+
+## Data management
+
+Protected GET `/api/exports/{expenses|allocations|debts|loans|repayments}.csv` supports required original-date ranges and optional person/deletion scope filters. Exports use exact Decimal strings, UTF-8 BOM, spreadsheet-safe quoting/formula neutralization, bounded database pages and private temporary spooling (10,000 rows/8 MiB). GET `/api/recycle-bin` paginates directly deleted expenses, independent loans and repayments with type/deletion-date filters. GET `/api/data-management/people` provides minimal historical people metadata. Existing CSRF-protected restore endpoints remain authoritative. There is no permanent deletion, migration or retention expiry. See [data-management.md](../docs/data-management.md) for the complete contract, CSV versus backup distinction, integrity restrictions and test limits.
 
 ## Spending analytics
 

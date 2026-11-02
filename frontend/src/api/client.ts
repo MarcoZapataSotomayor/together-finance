@@ -14,6 +14,7 @@ export interface RequestOptions {
   body?: unknown
   signal?: AbortSignal
   timeoutMs?: number
+  responseType?: 'response'
 }
 
 export async function apiRequest<T>(
@@ -64,6 +65,7 @@ export async function apiRequest<T>(
       throw new ApiError(response.status, fields)
     }
     if (response.status === 204) return undefined as T
+    if (options.responseType === 'response') return response as T
     return (await response.json()) as T
   } catch (error) {
     if (options.signal?.aborted) throw options.signal.reason
