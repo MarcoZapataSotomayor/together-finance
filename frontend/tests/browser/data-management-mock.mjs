@@ -3,8 +3,8 @@ import { debtIds as ids, paymentRecord } from '../debt-fixtures.mjs'
 import { exampleRecord } from '../finance-fixtures.mjs'
 
 // All financial reads and mutations in the browser check stay inside these synthetic fixtures.
-export async function installDataManagementMock(context) {
-  const finance = await installDebtMock(context)
+export async function installDataManagementMock(context, existingFinance) {
+  const finance = existingFinance ?? (await installDebtMock(context))
   const state = {
     finance,
     requests: [],

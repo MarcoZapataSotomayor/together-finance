@@ -7,6 +7,7 @@
   .expense-navigation a { display: flex; align-items: center; min-height: 44px; padding: 8px 17px; border: 1px solid transparent; border-radius: var(--button-radius); font-weight: 650; font-size: .87rem; text-align: center; color: var(--primary); }
   .expense-navigation a[aria-current] { color: var(--selection-ink); background: var(--selection-end); border-color: var(--input-border); }
   .workspace-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-block: 12px; }
+  .workspace-actions > a, .record-identifier a { display: inline-flex; align-items: center; min-height: 44px; }
   .workspace-actions .button, .reference-shortcuts .button, .history-pagination .button { min-height: 44px; }
   .workspace-notice { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 13px 16px; margin-block: 14px; border: 1px solid var(--frame-edge); border-radius: var(--button-radius); background: var(--surface); color: var(--text); font-size: .86rem; line-height: 1.7; overflow-wrap: anywhere; }
   .workspace-error { display: block; }

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { FrameOrnaments, OrnamentalDivider, StrawberrySprig } from '../components/decorations/Ornaments'
 import { Button } from '../components/ui/Button'
@@ -10,17 +10,25 @@ export function LoginScreen() {
   const [password, setPassword] = useState('')
   const [visible, setVisible] = useState(false)
   const input = useRef<HTMLInputElement>(null)
+  const restorePasswordFocus = useRef(false)
   const checking = auth.phase === 'checking'
   const busy = checking || auth.operation !== null
   const unavailable = auth.phase === 'error' || !auth.session
 
+  useEffect(() => {
+    if (restorePasswordFocus.current && !busy && !unavailable) {
+      restorePasswordFocus.current = false
+      input.current?.focus()
+    }
+  }, [busy, unavailable])
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!password || busy || unavailable) return
+    restorePasswordFocus.current = true
     const submitted = password
     setPassword(''); setVisible(false)
     await auth.login(submitted)
-    input.current?.focus()
   }
 
   return <section className="consumption-frame login-frame" aria-labelledby="login-title">
