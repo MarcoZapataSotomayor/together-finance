@@ -3,6 +3,7 @@ import type { FinanceApi } from '../../api/finance'
 import type { ExpenseRecord, References } from '../../api/types'
 import { FrameOrnaments } from '../../components/decorations/Ornaments'
 import { Button } from '../../components/ui/Button'
+import { ConfirmedMark } from '../../components/ui/ConfirmedMark'
 import { ApiFeedback, LoadingNotice } from './ApiFeedback'
 import { ExpenseFrameTitle } from './ExpenseFrameTitle'
 import { ExpenseSummary } from './ExpenseSummary'
@@ -129,6 +130,7 @@ export function ExpenseDetailScreen({
       </a>
       {notice && (
         <p role="status" className="form-message confirmation-message">
+          <ConfirmedMark />
           {notice}
         </p>
       )}
@@ -219,6 +221,13 @@ export function ExpenseDetailScreen({
                 role="group"
                 aria-labelledby="delete-question"
                 tabIndex={-1}
+                onKeyDown={event => {
+                  if (event.key === 'Escape' && !busy) {
+                    event.preventDefault()
+                    setConfirming(false)
+                    requestAnimationFrame(() => document.getElementById('delete-expense-button')?.focus())
+                  }
+                }}
               >
                 <h2 id="delete-question">¿Eliminar este consumo?</h2>
                 <p>

@@ -1,0 +1,173 @@
+/* State changes stay immediate; only their presentation settles. */
+:root,
+[data-theme='shared'] {
+  --motion-feedback: 150ms;
+  --motion-enter: 240ms;
+  --motion-confirm: 280ms;
+  --motion-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-distance: 3px;
+  --motion-direction: 0px;
+  --motion-ornament-angle: -1deg;
+}
+[data-theme='antonella'] {
+  --motion-feedback: 160ms;
+  --motion-enter: 280ms;
+  --motion-confirm: 320ms;
+  --motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-distance: 4px;
+  --motion-direction: 0px;
+  --motion-ornament-angle: -1.5deg;
+}
+[data-theme='marco'] {
+  --motion-feedback: 120ms;
+  --motion-enter: 180ms;
+  --motion-confirm: 220ms;
+  --motion-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-distance: 0px;
+  --motion-direction: -3px;
+  --motion-ornament-angle: 0deg;
+}
+
+@layer components {
+  .motion-confirmation-mark {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+    flex-shrink: 0;
+    color: var(--success);
+  }
+  .motion-confirmation-mark path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+  .motion-confirmed-heading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .expense-app .button,
+  .expense-app .form-field :is(input, select, textarea),
+  .expense-app .finance-navigation a,
+  .expense-app .segmented-options label > span {
+    transition:
+      translate var(--motion-feedback) var(--motion-ease),
+      scale var(--motion-feedback) var(--motion-ease),
+      background-color var(--motion-feedback) ease-out,
+      border-color var(--motion-feedback) ease-out;
+  }
+  .expense-app .form-field :is(input, textarea) {
+    caret-color: var(--primary);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .pov-selector[data-motion-ready='true'] input:checked + span {
+      animation: motion-selection var(--motion-enter) var(--motion-ease);
+    }
+    .expense-workspace > .consumption-frame,
+    .workspace-page:not([hidden]) > .consumption-frame {
+      animation: motion-page var(--motion-enter) var(--motion-ease);
+    }
+    .expense-workspace .title-crest {
+      transform-origin: 50% 80%;
+      animation: motion-ornament var(--motion-enter) var(--motion-ease);
+    }
+    .dashboard-spending,
+    .category-bars,
+    .monthly-bars {
+      animation: motion-panel var(--motion-enter) var(--motion-ease);
+    }
+    .reference-editor,
+    .delete-confirmation,
+    details[open] > :not(summary) {
+      animation: motion-page var(--motion-enter) var(--motion-ease);
+    }
+    .workspace-empty,
+    .workspace-notice,
+    .workspace-error,
+    .error-summary:not([hidden]) {
+      animation: motion-state var(--motion-feedback) var(--motion-ease);
+    }
+    .motion-confirmation-mark path {
+      animation: motion-check var(--motion-confirm) var(--motion-ease);
+    }
+    .expense-app .save-arrow {
+      transition: transform var(--motion-feedback) var(--motion-ease);
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .expense-app .button:not(:disabled):hover {
+        translate: 0 -1px;
+      }
+      .expense-app .save-expense-button:not(:disabled):hover .save-arrow {
+        transform: translateX(3px);
+      }
+    }
+    .expense-app .button:not(:disabled):active {
+      translate: 0 1px;
+      scale: 0.99;
+    }
+    .expense-app .save-expense-button:not(:disabled):active {
+      translate: 0 2px;
+      scale: 1;
+    }
+  }
+  /* Preserve selection, focus, status text and full checkmarks without spatial effects. */
+  @media (prefers-reduced-motion: reduce) {
+    .expense-app .button,
+    .expense-app .form-field :is(input, select, textarea),
+    .expense-app .finance-navigation a,
+    .expense-app .segmented-options label > span {
+      transition-property: background-color, border-color;
+      transition-duration: 100ms;
+    }
+  }
+  @keyframes motion-selection {
+    from {
+      transform: scale(0.975);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+  @keyframes motion-page {
+    from {
+      transform: translate(var(--motion-direction), var(--motion-distance));
+    }
+    to {
+      transform: translate(0, 0);
+    }
+  }
+  @keyframes motion-panel {
+    from {
+      transform: translateY(2px);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+  @keyframes motion-state {
+    from {
+      transform: translateY(1px);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+  @keyframes motion-ornament {
+    from {
+      transform: rotate(var(--motion-ornament-angle));
+    }
+    to {
+      transform: rotate(0);
+    }
+  }
+  @keyframes motion-check {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+}

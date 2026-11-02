@@ -2,6 +2,7 @@ import { useId, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import type { DebtApi, DebtRecord, DebtRepayment } from '../../api/debts'
 import { Button } from '../../components/ui/Button'
+import { ConfirmedMark } from '../../components/ui/ConfirmedMark'
 import { SelectField, TextField } from '../../components/ui/FormField'
 import { LoadingNotice } from '../expenses/ApiFeedback'
 import { localDate } from '../expenses/expenseModel'
@@ -43,12 +44,14 @@ export function RepaymentForm({
   const [found, setFound] = useState<DebtRepayment | null>(null)
   const lock = useRef(false),
     form = useRef<HTMLFormElement>(null)
+  const confirmation = useRef<HTMLDivElement>(null)
   const set = (field: keyof RepaymentValues, value: string) =>
     drafts.updatePayment(key, { ...values, [field]: value })
   function finish(record: DebtRepayment) {
     setSaved(record)
     drafts.clear(key)
     onChanged()
+    requestAnimationFrame(() => confirmation.current?.focus())
   }
   async function save(event: FormEvent) {
     event.preventDefault()
@@ -108,8 +111,8 @@ export function RepaymentForm({
   }
   if (saved)
     return (
-      <div className="workspace-empty">
-        <h2>Pago guardado</h2>
+      <div className="workspace-empty" ref={confirmation} tabIndex={-1}>
+        <h2 className="motion-confirmed-heading"><ConfirmedMark />Pago guardado</h2>
         <p role="status">
           El servidor confirmó {formatPen(saved.amount)} para esta deuda.
           Consulta el saldo actualizado en el detalle.

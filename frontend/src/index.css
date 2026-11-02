@@ -6,6 +6,7 @@
 @import './styles/debts.css';
 @import './styles/dashboard.css';
 @import './styles/data-management.css';
+@import './styles/motion.css';
 
 @layer base {
   html { scroll-padding-top: 1.5rem; }

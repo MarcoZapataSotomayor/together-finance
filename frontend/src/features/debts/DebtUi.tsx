@@ -8,6 +8,7 @@ import {
   OrnamentalDivider,
 } from '../../components/decorations/Ornaments'
 import { Button } from '../../components/ui/Button'
+import { ConfirmedMark } from '../../components/ui/ConfirmedMark'
 import { Badge } from '../../components/ui/Badge'
 import { ApiFeedback, LoadingNotice } from '../expenses/ApiFeedback'
 import { ExpenseFrameTitle } from '../expenses/ExpenseFrameTitle'
@@ -209,6 +210,7 @@ export function RecordActions({
     <div className="debt-record-actions">
       {notice && (
         <p className="form-message confirmation-message" role="status">
+          <ConfirmedMark />
           {notice}
         </p>
       )}
@@ -256,6 +258,13 @@ export function RecordActions({
           role="group"
           aria-labelledby={id}
           tabIndex={-1}
+          onKeyDown={event => {
+            if (event.key === 'Escape' && !busy) {
+              event.preventDefault()
+              setConfirming(false)
+              requestAnimationFrame(() => trigger.current?.focus())
+            }
+          }}
         >
           <h3 id={id}>¿Eliminar este {label}?</h3>
           <p>

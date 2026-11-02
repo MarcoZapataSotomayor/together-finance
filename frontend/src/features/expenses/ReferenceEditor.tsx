@@ -42,7 +42,13 @@ export function ReferenceEditor({
   const [busy, setBusy] = useState(false)
   const lock = useRef(false)
   const input = useRef<HTMLInputElement>(null)
-  useEffect(() => input.current?.focus(), [])
+  useEffect(() => {
+    const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    input.current?.focus()
+    return () => {
+      if (previous?.isConnected && !previous.closest('[hidden]')) previous.focus({ preventScroll: true })
+    }
+  }, [])
   async function save() {
     if (lock.current) return
     const normalized = name.trim().normalize('NFKC')
@@ -82,6 +88,10 @@ export function ReferenceEditor({
       className="add-payment-panel reference-editor"
       aria-labelledby={`${idPrefix}-title`}
       onKeyDown={(event) => {
+        if (event.key === 'Escape' && !busy) {
+          event.preventDefault()
+          onCancel()
+        }
         if (event.key === 'Enter' && event.target instanceof HTMLInputElement) {
           event.preventDefault()
           void save()
