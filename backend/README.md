@@ -1,6 +1,6 @@
 # Together Finance API
 
-NestJS 12 / TypeScript with Express, Prisma 7.10.1, and Neon PostgreSQL. The API provides public health, shared-password authentication, protected expenses/reference data, debt summaries, independent loans and repayments. No individual accounts are created. The frontend consumes these existing endpoints; see [expense integration](../docs/frontend-expenses.md) and [debt/loan/repayment integration](../docs/frontend-debts.md). The latter requires no backend compatibility or schema change.
+NestJS 12 / TypeScript with Express, Prisma 7.10.1, and Neon PostgreSQL. The API provides public health, shared-password authentication, protected expenses/reference data, spending analytics, debt summaries, independent loans and repayments. No individual accounts are created. The frontend consumes these endpoints; see [expense integration](../docs/frontend-expenses.md), [debt/loan/repayment integration](../docs/frontend-debts.md) and [analytics/dashboard documentation](../docs/analytics.md).
 
 ## Local startup
 
@@ -38,6 +38,7 @@ src/
   generated/prisma/         Generated, Git-ignored ESM client compiled with Nest
   finance/                  Decimal rules, serializable transactions, validation, safe error filter
   expenses/                 Controller, DTOs, transactional service, projection, and tests
+  analytics/                Protected read-only spending aggregation, exact cents, DTOs, and tests
   reference-data/           People/category/method creation/listing, DTOs, and tests
   debts/                    Shared debt projection/validation, filters, lists, summaries, and tests
   loans/                    Independent loan DTOs, controller, transactional service, and module
@@ -59,7 +60,11 @@ Protected routes: `POST/GET /api/expenses`, `GET/PATCH/DELETE /api/expenses/:id`
 
 Expense writes and related allocations/debts use serializable interactive transactions with bounded whole-operation retries. No repayment row is rewritten or removed. Repayment history freezes debt principal/parties/date; incompatible corrections return 409. Delete changes only the parent flag; restore revalidates related financial records before reviving eligible children. Tests cover rollback/retry behavior with mocks, not real PostgreSQL concurrency.
 
-No migration was required. Before manual API writes, verify the configured connection against the intended Neon development branch in the console. The implementation's validation created no live database records and made no branch identity assertion. Do not use the real database as a fixture store. Current backend validation passes build/lint, 135 unit tests, and 147 API tests, including the debt/loan/repayment suites.
+No migration was required. Before manual API writes, verify the configured connection against the intended Neon development branch in the console. The implementation's validation created no live database records and made no branch identity assertion. Do not use the real database as a fixture store. Current backend validation passes build/lint/schema validation, 149 unit tests, and 161 API tests, including the debt/loan/repayment and analytics suites.
+
+## Spending analytics
+
+`AnalyticsModule` exposes protected `GET /api/analytics/spending?from=YYYY-MM-DD&to=YYYY-MM-DD&personId=UUID`. Date-only boundaries are inclusive and limited to 24 calendar months; person selection is optional. It returns exact decimal-string spending, personal/shared distribution, zero-filled monthly totals, categories, separate allocation/funding contributions, compact person metadata and five recent expenses. Read aggregation uses minimal projections, batches and one Serializable snapshot. No schema, dependency, authentication or financial-write changes were needed. See [analytics.md](../docs/analytics.md) for DTOs, examples, exact rules, tests and scale limitations.
 
 ## Debts, loans and repayments
 

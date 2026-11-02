@@ -21,6 +21,7 @@ import type { CreatedReference, ReferenceKind } from './ReferenceEditor'
 import { useFinanceApi } from './useFinanceApi'
 import { useResource } from './useResource'
 import { DebtWorkspace } from '../debts/DebtWorkspace'
+import { Dashboard } from '../dashboard/Dashboard'
 
 function subscribe(listener: () => void) {
   window.addEventListener('hashchange', listener)
@@ -58,7 +59,8 @@ export function ExpenseWorkspace() {
     }),
     [resource.data, created],
   )
-  const route = hash.replace(/^#/, '') || '/expenses/new'
+  const route = hash.replace(/^#/, '') || '/dashboard'
+  const isDashboard = route === '/dashboard'
   const segments = route.split('/')
   const isNew = route === '/expenses/new'
   const isHistory = route === '/expenses'
@@ -98,6 +100,7 @@ export function ExpenseWorkspace() {
   return (
     <div className="expense-workspace">
       <nav className="expense-navigation finance-navigation" aria-label="Navegación financiera">
+        <a href="#/dashboard" aria-current={isDashboard ? 'page' : undefined}>Resumen</a>
         <a href="#/expenses/new" aria-current={isNew ? 'page' : undefined}>
           Nuevo consumo
         </a>
@@ -111,10 +114,10 @@ export function ExpenseWorkspace() {
         <a href="#/loans" aria-current={segments[1] === 'loans' ? 'page' : undefined}>Préstamos</a>
         <a href="#/repayments" aria-current={segments[1] === 'repayments' ? 'page' : undefined}>Pagos</a>
       </nav>
-      {resource.loading && (
+      {!isDashboard && resource.loading && (
         <LoadingNotice text="Cargando personas, categorías y medios de pago…" />
       )}
-      {resource.error != null && (
+      {!isDashboard && resource.error != null && (
         <ApiFeedback
           error={resource.error}
           onRetry={() => setReferenceVersion((value) => value + 1)}
@@ -154,7 +157,8 @@ export function ExpenseWorkspace() {
         />
       )}
       {isDebtSection && <DebtWorkspace route={route} financeApi={api} references={references} ready={ready} version={version} onChanged={changed} onReferenceCreated={createdReference} onReloadReferences={() => setReferenceVersion(value => value + 1)} />}
-      {!isNew && !isHistory && !isDetail && !isDebtSection && (
+      {isDashboard && <Dashboard version={version} />}
+      {!isNew && !isHistory && !isDetail && !isDebtSection && !isDashboard && (
         <section className="workspace-empty">
           <h1>No encontramos esta página</h1>
           <a href="#/expenses">Volver al historial</a>

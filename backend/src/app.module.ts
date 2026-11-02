@@ -9,6 +9,7 @@ import { ReferenceDataModule } from './reference-data/reference-data.module.js';
 import { DebtsModule } from './debts/debts.module.js';
 import { LoansModule } from './loans/loans.module.js';
 import { RepaymentsModule } from './repayments/repayments.module.js';
+import { AnalyticsModule } from './analytics/analytics.module.js';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { RepaymentsModule } from './repayments/repayments.module.js';
     DebtsModule,
     LoansModule,
     RepaymentsModule,
+    AnalyticsModule,
     HealthModule,
   ],
 })

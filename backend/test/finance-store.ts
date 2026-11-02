@@ -109,13 +109,15 @@ export class FinanceStore {
         async ({ where }: any) =>
           this[kind].filter((row) => this.matchingReference(row, where)).length,
       ),
-      findMany: vi.fn(async ({ where, skip = 0, take = 20 }: any) =>
-        this[kind]
-          .filter((row) => this.matchingReference(row, where))
-          .sort(
-            (a, b) => a.name.localeCompare(b.name) || a.id.localeCompare(b.id),
-          )
-          .slice(skip, skip + take),
+      findMany: vi.fn(
+        async ({ where, skip = 0, take = Number.MAX_SAFE_INTEGER }: any) =>
+          this[kind]
+            .filter((row) => this.matchingReference(row, where))
+            .sort(
+              (a, b) =>
+                a.name.localeCompare(b.name) || a.id.localeCompare(b.id),
+            )
+            .slice(skip, skip + take),
       ),
       create: vi.fn(async ({ data }: any) => {
         const row = {
