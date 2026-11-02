@@ -1,0 +1,42 @@
+# Inactive until explicitly selected as the Blueprint path. Creation itself deploys: obtain authorization first.
+# yaml-language-server: $schema=https://render.com/schema/render.yaml.json
+services:
+  - type: web
+    name: together-finance-api-staging
+    runtime: node
+    plan: free
+    branch: develop
+    rootDir: backend
+    autoDeployTrigger: "off"
+    numInstances: 1
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm run check:staging && npm run start:prod
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 24.18.0
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_COOKIE_SAME_SITE
+        value: lax
+      - key: SESSION_TTL_SECONDS
+        value: "28800"
+      # Safe refusal to trust forwarded client IPs until both ingress paths are verified.
+      - key: TRUST_PROXY_HOPS
+        value: "0"
+      - key: DATABASE_URL
+        sync: false
+      - key: SHARED_PASSWORD_HASH
+        sync: false
+      - key: SESSION_SECRET
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: STAGING_FRONTEND_ORIGIN
+        sync: false
+      - key: STAGING_EXPECTED_DATABASE_HOST
+        sync: false
+      - key: STAGING_EXPECTED_DATABASE_NAME
+        sync: false
+      - key: STAGING_DATABASE_CONFIRMED
+        sync: false

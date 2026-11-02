@@ -121,7 +121,7 @@ export function allowedPrismaCommand(args, env) {
   }
   const url = parseDatabaseUrl(direct);
   if (
-    !['development', 'production'].includes(env.MIGRATION_TARGET) ||
+    !['development', 'staging', 'production'].includes(env.MIGRATION_TARGET) ||
     env.MIGRATION_EXPECTED_HOST !== url.hostname ||
     env.MIGRATION_EXPECTED_DATABASE !==
       decodeURIComponent(url.pathname.slice(1)) ||
@@ -139,4 +139,29 @@ export function allowedPrismaCommand(args, env) {
     throw new Error(
       'Reviewed deployment migrations require a direct TLS connection.',
     );
+  if (env.MIGRATION_TARGET === 'staging') assertStagingDatabase(direct, env);
+}
+
+// Pins are independent operator assertions, not proof of the branch's identity or contents.
+export function assertStagingDatabase(value, env, pooled = false) {
+  const url = parseDatabaseUrl(value);
+  const expected = env.STAGING_EXPECTED_DATABASE_HOST;
+  if (
+    typeof expected !== 'string' ||
+    !/^ep-[a-z0-9-]+\.[a-z0-9.-]+\.neon\.tech$/.test(expected) ||
+    expected.includes('-pooler.') ||
+    env.STAGING_DATABASE_CONFIRMED !== 'fictional-only' ||
+    !env.STAGING_EXPECTED_DATABASE_NAME ||
+    decodeURIComponent(url.pathname.slice(1)) !==
+      env.STAGING_EXPECTED_DATABASE_NAME ||
+    url.hostname !== (pooled ? expected.replace('.', '-pooler.') : expected) ||
+    !['require', 'verify-ca', 'verify-full'].includes(
+      url.searchParams.get('sslmode'),
+    ) ||
+    url.port
+  )
+    throw new Error(
+      'Staging requires a confirmed fictional-only Neon branch and matching independent host/database pins; values omitted.',
+    );
+  return url;
 }

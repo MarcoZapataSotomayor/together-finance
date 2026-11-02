@@ -34,6 +34,7 @@
     "test:postgres": "node scripts/run-postgres-tests.mjs",
     "test:safety": "node --test scripts/*.test.mjs",
     "check:repository": "node scripts/check-repository-safety.mjs",
+    "check:staging": "node scripts/check-staging-env.mjs",
     "db:backup": "node scripts/backup-restore.mjs backup",
     "db:restore:isolated": "node scripts/backup-restore.mjs restore"
   },
