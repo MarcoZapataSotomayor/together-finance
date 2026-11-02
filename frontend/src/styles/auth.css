@@ -21,7 +21,7 @@
   .auth-spinner { flex-shrink: 0; width: 18px; height: 18px; border: 2px solid var(--control-border); border-top-color: transparent; border-radius: 50%; animation: auth-spin 900ms linear infinite; }
   .auth-error, .auth-notice { position: relative; margin-bottom: 18px; padding: 12px 14px; border: 1px solid currentColor; border-radius: var(--button-radius); color: var(--danger); background: var(--surface); font-size: .82rem; line-height: 1.65; text-align: left; }
   .auth-notice { color: var(--text); background: var(--yellow); }
-  .expense-masthead .logout-button { color: inherit; background: var(--surface); border: 1px solid var(--frame-edge); min-height: 44px; font-size: .75rem; padding: 7px 12px; }
+  .expense-masthead .logout-button.button { color: inherit; background: var(--surface); border: 1px solid var(--frame-edge); min-height: 44px; font-size: .75rem; padding: 7px 12px; }
   [data-theme='marco'] .login-frame h1 { font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; font-size: 2.8rem; }
   [data-theme='marco'] .login-lock { border: 2px solid var(--text); border-radius: 8px; background: var(--blue); transform: rotate(-5deg); }
   [data-theme='marco'] .login-crest { display: none; }

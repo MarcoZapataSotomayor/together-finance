@@ -1,10 +1,10 @@
 @layer components {
   .strawberry-sprig, .ribbon-bow, .corner-flourish, .scalloped-frame, .plaque-shape, .comic-skyline { pointer-events: none; }
-  .expense-app { position: relative; isolation: isolate; min-height: 100svh; padding: 14px 0 22px; background-color: var(--background); background-image: radial-gradient(circle at 40% 0, #dcebf1, transparent 60%), repeating-linear-gradient(145deg, transparent 0 180px, #293846 181px 185px, #cf6470 186px 207px, #293846 208px 212px, transparent 213px 360px); background-attachment: fixed; }
+  .expense-app { overflow-wrap: anywhere; position: relative; isolation: isolate; min-height: 100svh; padding: 14px 0 22px; background-color: var(--background); background-image: radial-gradient(circle at 40% 0, #dcebf1, transparent 60%), repeating-linear-gradient(145deg, transparent 0 180px, #293846 181px 185px, #cf6470 186px 207px, #293846 208px 212px, transparent 213px 360px); background-attachment: fixed; }
   .expense-app::before { content: ''; position: absolute; z-index: -1; inset: 0; pointer-events: none; background-image: radial-gradient(#24384570 .85px, transparent 1px); background-size: 7px 7px; mask-image: linear-gradient(90deg, black, transparent 17% 83%, black); }
   .expense-header, .expense-main, .expense-footer { width: min(100% - 26px, 1050px); margin-inline: auto; position: relative; }
   .expense-masthead { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 16px; margin-bottom: 17px; color: #243441; }
-  .expense-brand { display: inline-flex; align-items: center; gap: 7px; font-size: .84rem; font-weight: 650; text-decoration: none; }
+  .expense-brand { display: inline-flex; align-items: center; min-height: 44px; gap: 7px; font-size: .84rem; font-weight: 650; text-decoration: none; }
   .expense-brand svg { width: 17px; height: 17px; }
   .expense-masthead > span { font-size: .65rem; font-weight: 600; }
   .pov-frame { position: relative; width: min(100%, 700px); margin-inline: auto; padding: 5px; background: linear-gradient(#fffdf2, #f6e8dd); border: 2px solid var(--frame-edge); border-radius: 50px; box-shadow: 0 3px 0 #5d485644, inset 0 0 0 2px #fffaf3; }
@@ -23,7 +23,7 @@
   .plaque-shape { position: absolute; z-index: -1; inset: 0; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 4px 0 #a63b4b); }
   .plaque-shape > path { fill: #ffdce0; stroke: #963e51; stroke-width: 2; paint-order: stroke; }
   .title-plaque::after { content: ''; position: absolute; inset: 8px 13px 10px; border: 1px solid #fffaf0; border-radius: 33% / 30%; pointer-events: none; }
-  .title-plaque h1 { position: relative; color: #542337; font-family: var(--heading-font); font-size: clamp(2rem, 8.3vw, 3.8rem); font-style: italic; font-weight: 700; line-height: 1.15; letter-spacing: -.025em; white-space: nowrap; text-shadow: 0 1px #fffdf0; }
+  .title-plaque h1 { position: relative; color: #542337; font-family: var(--heading-font); font-size: clamp(2rem, 8.3vw, 3.8rem); font-style: italic; font-weight: 700; line-height: 1.15; letter-spacing: -.025em; white-space: normal; text-align: center; text-shadow: 0 1px #fffdf0; }
   .title-crest { position: absolute; z-index: 2; width: 112px; top: -63px; left: calc(50% - 56px); filter: drop-shadow(0 2px 1px #795e5844); }
   .title-bow { display: none; }
   .frame-ornaments { position: absolute; inset: 0; pointer-events: none; }
@@ -119,6 +119,8 @@
   .add-method-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
   .expense-footer { display: flex; align-items: center; justify-content: center; gap: 7px; margin-top: 53px; color: #293846; font-size: .66rem; text-align: center; }
   .expense-footer svg { width: 14px; height: 14px; }
+  :is([data-theme='shared'], [data-theme='marco']) :is(.expense-brand, .expense-masthead > span, .expense-footer) { background: var(--paper); border-radius: var(--button-radius); padding: 6px 10px; }
+  :is([data-theme='shared'], [data-theme='marco']) .expense-footer { width: fit-content; max-width: calc(100% - 26px); }
   .comic-burst { display: inline-block; width: 27px; height: 27px; background: #bb3d4d; clip-path: polygon(0 100%, 32% 0, 45% 4%, 15% 100%, 90% 16%, 100% 30%, 23% 100%); }
   [data-theme='shared'] .pov-frame .pov-option input:checked + span { background: linear-gradient(160deg, #bc3e50, #9d2c3e); color: #fff9ee; border-color: #7b293b; }
   [data-theme='shared'] .form-field > label, [data-theme='shared'] .allocation-panel h2, [data-theme='shared'] .division-panel h3 { color: #202432; font-weight: 700; }

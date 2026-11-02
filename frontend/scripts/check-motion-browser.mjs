@@ -53,6 +53,11 @@ try {
     frame().getByRole('button', { name: label, exact: true })
   const visibleMarks = () =>
     page.locator('.motion-confirmation-mark:visible').count()
+  const waitFocus = async (locator) =>
+    page.waitForFunction(
+      (node) => node === document.activeElement,
+      await locator.elementHandle(),
+    )
   const waitRequest = (method) =>
     page.waitForRequest(
       (r) =>
@@ -97,6 +102,7 @@ try {
     const add = button('Agregar medio de pago')
     await add.click()
     await page.locator('.reference-editor input').first().waitFor()
+    await waitFocus(page.locator('.reference-editor input').first())
     assert.equal(
       await page
         .locator('.reference-editor input')
@@ -138,6 +144,7 @@ try {
     await frame().getByText('Consumo guardado:', { exact: false }).waitFor()
     assert.equal(state.expense.amount, '12.34')
     await checkMark(reduced)
+    await waitFocus(frame().locator('.confirmation-message'))
     assert.equal(
       await frame()
         .locator('.confirmation-message')
@@ -167,6 +174,7 @@ try {
     await page.locator('.delete-confirmation').waitFor()
     await page.keyboard.press('Escape')
     await page.locator('.delete-confirmation').waitFor({ state: 'detached' })
+    await waitFocus(button('Eliminar consumo'))
     assert.equal(
       await button('Eliminar consumo').evaluate(
         (n) => n === document.activeElement,
@@ -193,6 +201,7 @@ try {
       .getByRole('heading', { name: 'Pago guardado', exact: true })
       .waitFor()
     await checkMark(reduced)
+    await waitFocus(frame().locator('.workspace-empty'))
     assert.equal(
       await frame()
         .locator('.workspace-empty')
@@ -205,6 +214,7 @@ try {
     await page.locator('.delete-confirmation').waitFor()
     await page.keyboard.press('Escape')
     await page.locator('.delete-confirmation').waitFor({ state: 'detached' })
+    await waitFocus(button('Eliminar préstamo'))
     assert.equal(
       await button('Eliminar préstamo').evaluate(
         (n) => n === document.activeElement,
@@ -230,9 +240,11 @@ try {
         await page.locator('.dashboard-spending-amount').waitFor()
       if (path.includes('/pay')) await field('Persona que paga').waitFor()
       for (const theme of ['antonella', 'shared', 'marco']) {
-        await page
-          .locator(`.pov-selector input[value=${theme}]`)
-          .check({ force: true })
+        await page.locator(`.pov-option:has(input[value=${theme}])`).click()
+        await page.waitForFunction(
+          (theme) => document.documentElement.dataset.theme === theme,
+          theme,
+        )
         if (path === '/dashboard')
           await page.locator('.dashboard-spending-amount').waitFor()
         for (const width of [320, 375, 390, 768, 1440]) {

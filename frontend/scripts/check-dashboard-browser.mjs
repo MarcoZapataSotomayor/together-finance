@@ -119,6 +119,7 @@ try {
   state.fail = 0
   await button('Volver a cargar').click()
   await amount().waitFor()
+  await page.waitForLoadState('networkidle')
   state.expireNext = true
   await button('Actualizar resumen').click()
   await page

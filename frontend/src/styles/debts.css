@@ -34,7 +34,7 @@
   .debt-list > li { padding-block: 24px; border-bottom: 1px solid var(--frame-edge); }
   .debt-list article { min-width: 0; }
   .debt-list h3 { font-size: 1.06rem; font-weight: 700; line-height: 1.45; overflow-wrap: anywhere; margin-block: 12px; }
-  .debt-list h3 a { text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--frame-edge); }
+  .debt-list h3 a { display: inline-flex; align-items: center; min-height: 44px; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--frame-edge); }
   .debt-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-block: 10px; }
   .debt-badges .badge { white-space: normal; max-width: 100%; }
   .debt-description { color: var(--muted-text); font-size: .9rem; overflow-wrap: anywhere; white-space: pre-wrap; }

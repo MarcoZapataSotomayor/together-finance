@@ -71,6 +71,7 @@
     margin-block: 14px;
     line-height: 1.45;
   }
+  .data-bin-entry h2 a { display: inline-flex; align-items: center; min-height: 44px; }
   .data-bin-entry a {
     color: var(--primary);
     text-decoration: underline;
