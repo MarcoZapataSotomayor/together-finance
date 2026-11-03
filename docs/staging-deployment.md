@@ -1,5 +1,7 @@
 # Isolated staging deployment preparation
 
+> Historical optional procedure, superseded by [Together Finance 1.0 production deployment](production-deployment.md). The release uses one production application on `main`; do not provision a permanent staging application. The former Vercel file is archived at `docs/deployment/vercel.staging.json`, and its existing guards/tests remain intact. The active `frontend/vercel.json` is now production-only. Instructions below describe the earlier preparation, not current production setup.
+
 Prepared on November 1, 2026, on `feat/staging-deployment`. **No account was connected, service/project/branch created, application deployed or existing Neon database accessed.** All cloud setup, hosted tests and migration execution below remain pending explicit authorization. Importing a project or creating a Blueprint can start an initial deployment; disabling later automatic deployments does not make initial creation a read-only action.
 
 This is a staging-only configuration for fictional financial records. It is not a production release. Continue to follow [production readiness](production-readiness.md), [backup/restore](backup-restore.md), [authentication](authentication.md) and [the final quality audit](final-quality-audit.md).

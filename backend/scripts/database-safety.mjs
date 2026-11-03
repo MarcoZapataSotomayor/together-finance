@@ -140,6 +140,41 @@ export function allowedPrismaCommand(args, env) {
       'Reviewed deployment migrations require a direct TLS connection.',
     );
   if (env.MIGRATION_TARGET === 'staging') assertStagingDatabase(direct, env);
+  if (env.MIGRATION_TARGET === 'production') {
+    assertProductionDatabase(direct, env);
+    if (
+      env.MIGRATION_BACKUP_CONFIRMED !== 'restored-and-verified' ||
+      !/^[a-f0-9]{64}$/.test(env.MIGRATION_RESTORE_SHA256 ?? '') ||
+      env.BACKUP_STORAGE_CONFIRMED !== 'encrypted' ||
+      !env.MIGRATION_BACKUP_MANIFEST
+    )
+      throw new Error(
+        'Production migration requires a current protected backup manifest and explicit restoration confirmation.',
+      );
+  }
+}
+
+export function assertProductionDatabase(value, env, pooled = false) {
+  const url = parseDatabaseUrl(value);
+  const host = env.PRODUCTION_EXPECTED_DATABASE_HOST;
+  if (
+    env.PRODUCTION_DATABASE_CONFIRMED !== 'production' ||
+    typeof host !== 'string' ||
+    !/^ep-[a-z0-9-]+\.[a-z0-9.-]+\.neon\.tech$/.test(host) ||
+    host.includes('-pooler.') ||
+    url.hostname !== (pooled ? host.replace('.', '-pooler.') : host) ||
+    !env.PRODUCTION_EXPECTED_DATABASE_NAME ||
+    decodeURIComponent(url.pathname.slice(1)) !==
+      env.PRODUCTION_EXPECTED_DATABASE_NAME ||
+    !['require', 'verify-ca', 'verify-full'].includes(
+      url.searchParams.get('sslmode'),
+    ) ||
+    url.port
+  )
+    throw new Error(
+      'Production requires independently verified Neon host/database pins, TLS and explicit identity confirmation; values omitted.',
+    );
+  return url;
 }
 
 // Pins are independent operator assertions, not proof of the branch's identity or contents.

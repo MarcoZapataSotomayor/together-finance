@@ -106,7 +106,7 @@ if (
 ) {
   try {
     const config = JSON.parse(
-      await readFile(new URL('../vercel.json', import.meta.url), 'utf8'),
+      await readFile(new URL('../../docs/deployment/vercel.staging.json', import.meta.url), 'utf8'),
     )
     checkStagingConfig(config, process.env)
     console.log(

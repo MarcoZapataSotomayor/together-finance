@@ -60,14 +60,16 @@ The workflow adds database-safety tests and the scoped repository check, retains
 
 ## Render and Vercel preparation
 
-For the isolated staging procedure, use [staging deployment](staging-deployment.md). The checked-in `frontend/vercel.json` is staging-only and deliberately refuses an unconfigured target. `render.staging.yaml` disables automatic deployments and must be selected explicitly; creating a Blueprint still initiates its first deployment. The older generic Vercel example below remains inactive and is not the staging configuration.
+For the current single-application 1.0 release, follow [production deployment](production-deployment.md). It uses `render.production.yaml` on `main`, a production-only Vercel preflight and no configured hostnames until review. Production migrations now additionally require a current protected archive, a matching recovery-drill checksum and explicit restoration approval. The staging procedure below is retained as historical optional guidance, not a deployment requirement.
+
+The optional staging procedure is archived in [staging deployment](staging-deployment.md), with its Vercel snapshot at `docs/deployment/vercel.staging.json`. Its guards remain available, but no staging application is required for the 1.0 release.
 
 | Setting | Frontend / Vercel | Backend / Render |
 | --- | --- | --- |
 | Root directory | `frontend` | `backend` |
 | Runtime | Node 24.x, maintained patch | Node 24.x, maintained patch |
-| Install/build | `npm ci`, then `npm run build` | `npm ci --include=dev && npm run build` |
-| Output/start | `dist` | `npm run start:prod` (`node dist/main.js`) |
+| Install/build | `npm ci --include=dev`, then `node scripts/check-production-config.mjs && npm run build` | `npm ci --include=dev && npm run build` |
+| Output/start | `dist` | `npm run check:production && npm run start:prod` (`node dist/main.js`) |
 | Health | Static frontend smoke check | `/api/health` |
 | Database action at build/start | None | Generate Prisma Client only; never migrate automatically |
 
@@ -82,7 +84,7 @@ Backend environment:
 - `CORS_ORIGINS`: only the exact approved HTTPS frontend origin(s); no wildcard previews. Add a particular isolated preview explicitly when testing it.
 - `TRUST_PROXY_HOPS`: a verified number from 0–2 for the actual ingress; test spoofed forwarded headers and the public direct Render route before selecting it. Do not copy an assumed value from a tutorial.
 
-Vercel needs only public `VITE_API_URL=/api` for the recommended proxy. [vercel.example.json](deployment/vercel.example.json) is an **inactive example**, not a deployed configuration. Replace the placeholder destination and review it before copying into `frontend/vercel.json`. It uses an external `/api/:path*` rewrite and defensive frontend headers; validate CSP initially in an isolated preview/report-only mode if needed. Bundled fonts remain local, and existing chart style attributes are allowed without allowing inline scripts. The current hash routes do not require a catch-all SPA rewrite. Do not redirect API traffic to index.html or enable rewrite caching for private data. Vercel supports external API proxy rewrites; see [its documentation](https://vercel.com/docs/routing/rewrites).
+Vercel uses public `VITE_API_URL=/api` plus the production origin/approval pins described in the current runbook. The inactive [vercel.example.json](deployment/vercel.example.json) now mirrors the production template with no configured rewrite destination; configure it only after the actual owned hostname is reviewed. The active frontend preflight refuses an empty or mismatched target. Hash routes need no catch-all rewrite. Keep explicit no-store headers at all API cache layers: current provider behavior can honor upstream caching headers, so do not rely on earlier uncached-by-default assumptions. The existing frontend CSP permits local assets and chart style attributes without inline scripts.
 
 Verify the proxy preserves Origin, Cookie, Set-Cookie, CSRF headers, status codes, query parameters, CSV bytes and attachment headers. Browser cookies should belong to the frontend origin. SameSite Lax works because the browser calls its own `/api`; the API's Origin checks must still see the frontend origin. If using sibling custom domains instead, HTTPS sites may share a site while remaining distinct origins; keep exact CORS and host-only cookies. Separate unrelated default hosting domains require SameSite None and can still fail in privacy-restrictive browsers, so that topology is not the preferred release path.
 
@@ -92,7 +94,7 @@ Render's Free service sleeps after fifteen idle minutes, can take about a minute
 
 The frontend already shows loading/server-waking states and bounds read retries; mutations are never automatically repeated. Users can re-login/retry after a timeout, using the existing UUID recovery logic for uncertain writes. Do not add keep-alive polling or paid uptime services. Health is liveness, not a guarantee that a later database operation will succeed. Graceful shutdown disconnects Prisma; an interrupted transaction must be retried as a new whole operation with the same creation UUID. Do not introduce multiple instances with the current store.
 
-Before any future migration: confirm branch/endpoint in the console; take and verify a protected backup; review SQL for destructive statements and compatibility with the currently running revision; rehearse on a fresh restored local copy. A deliberate operator then supplies `MIGRATION_TARGET=production`, `MIGRATION_EXPECTED_HOST`, `MIGRATION_EXPECTED_DATABASE` and `MIGRATION_APPROVED=yes` alongside the direct URL and runs `npm run prisma:migrate:deploy`. Development uses its own explicit target/pins. The flags record operator intent, not proof that a backup was reviewed. There are **no new migrations in this stage**. Never invoke reset, force-push or clean/overwrite restore against either existing Neon branch.
+Before any production migration, follow the complete current [production migration and recovery procedure](production-deployment.md#backup-recovery-proof-and-guarded-initial-migration). It requires explicit production identity and migration pins, direct TLS, a protected archive/manifest no more than 24 hours old, a matching checksum independently recorded after a successful recovery drill, and final approval. No automatic migration or destructive wrapper command is allowed. Development and archived staging retain their separate guards. No migration file or schema was added by this deployment-preparation work.
 
 Use expand/contract migrations for future changes. Deploy a compatible backend, verify authenticated reads and a deliberately authorized test write in an isolated preview, then deploy the frontend. Code rollback requires schema compatibility; database recovery is not an automatic down migration. Free Render has no one-off job/shell facility, so reviewed migrations may need a trusted local operator environment rather than a start-command hook. No hosting connections were configured here.
 

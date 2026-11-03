@@ -56,9 +56,16 @@ test('Prisma wrapper rejects destructive commands, arbitrary flags and unapprove
   assert.throws(() => allowedPrismaCommand(['migrate', 'deploy'], {}));
   const env = {
     DIRECT_URL:
-      'postgresql://placeholder:placeholder@direct.example/database?sslmode=verify-full',
+      'postgresql://placeholder:placeholder@ep-production.region.aws.neon.tech/database?sslmode=verify-full',
     MIGRATION_TARGET: 'production',
-    MIGRATION_EXPECTED_HOST: 'direct.example',
+    MIGRATION_EXPECTED_HOST: 'ep-production.region.aws.neon.tech',
+    PRODUCTION_EXPECTED_DATABASE_HOST: 'ep-production.region.aws.neon.tech',
+    PRODUCTION_EXPECTED_DATABASE_NAME: 'database',
+    PRODUCTION_DATABASE_CONFIRMED: 'production',
+    MIGRATION_BACKUP_MANIFEST: '/protected/current.dump.json',
+    MIGRATION_BACKUP_CONFIRMED: 'restored-and-verified',
+    MIGRATION_RESTORE_SHA256: 'a'.repeat(64),
+    BACKUP_STORAGE_CONFIRMED: 'encrypted',
     MIGRATION_EXPECTED_DATABASE: 'database',
     MIGRATION_APPROVED: 'yes',
   };
