@@ -1,0 +1,164 @@
+generator client {
+  provider               = "prisma-client"
+  output                 = "../src/generated/prisma"
+  moduleFormat           = "esm"
+  generatedFileExtension = "ts"
+  importFileExtension    = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Currency {
+  PEN
+}
+
+enum PaymentMethodType {
+  CASH
+  BANK_TRANSFER
+  CREDIT_CARD
+  DEBIT_CARD
+  OTHER
+}
+
+enum ExpenseClassification {
+  PERSONAL
+  SHARED
+}
+
+enum DebtOrigin {
+  EXPENSE
+  LOAN
+}
+
+model Person {
+  id              String              @id @default(uuid()) @db.Uuid
+  name            String              @db.Text
+  notes           String?             @db.Text
+  isActive        Boolean             @default(true) @map("is_active")
+  createdAt       DateTime            @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime            @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+  paymentMethods  PaymentMethod[]
+  fundedExpenses  Expense[]           @relation("ExpenseFunder")
+  allocations     ExpenseAllocation[]
+  debtsAsDebtor   Debt[]              @relation("DebtDebtor")
+  debtsAsCreditor Debt[]              @relation("DebtCreditor")
+
+  @@map("people")
+}
+
+model Category {
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String    @db.Text
+  description String?   @db.Text
+  isActive    Boolean   @default(true) @map("is_active")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+  expenses    Expense[]
+
+  // Case-insensitive trimmed uniqueness is enforced by the SQL migration.
+  @@map("categories")
+}
+
+model PaymentMethod {
+  id            String            @id @default(uuid()) @db.Uuid
+  name          String            @db.Text
+  type          PaymentMethodType
+  ownerPersonId String?           @map("owner_person_id") @db.Uuid
+  description   String?           @db.Text
+  isActive      Boolean           @default(true) @map("is_active")
+  createdAt     DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt     DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+  owner         Person?           @relation(fields: [ownerPersonId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  expenses      Expense[]
+
+  @@index([ownerPersonId])
+  @@map("payment_methods")
+}
+
+model Expense {
+  id               String                @id @default(uuid()) @db.Uuid
+  amount           Decimal               @db.Decimal(14, 2)
+  currency         Currency              @default(PEN)
+  purchasedOn      DateTime              @map("purchased_on") @db.Date
+  merchant         String                @db.Text
+  description      String?               @db.Text
+  categoryId       String                @map("category_id") @db.Uuid
+  paymentMethodId  String                @map("payment_method_id") @db.Uuid
+  fundedByPersonId String                @map("funded_by_person_id") @db.Uuid
+  classification   ExpenseClassification
+  createdAt        DateTime              @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime              @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deletedAt        DateTime?             @map("deleted_at") @db.Timestamptz(3)
+  category         Category              @relation(fields: [categoryId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  paymentMethod    PaymentMethod         @relation(fields: [paymentMethodId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  fundedBy         Person                @relation("ExpenseFunder", fields: [fundedByPersonId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  allocations      ExpenseAllocation[]
+
+  @@index([categoryId])
+  @@index([paymentMethodId])
+  @@index([fundedByPersonId, purchasedOn])
+  @@index([deletedAt, purchasedOn])
+  @@map("expenses")
+}
+
+model ExpenseAllocation {
+  id         String    @id @default(uuid()) @db.Uuid
+  expenseId  String    @map("expense_id") @db.Uuid
+  personId   String    @map("person_id") @db.Uuid
+  percentage Decimal   @db.Decimal(7, 4)
+  amount     Decimal   @db.Decimal(14, 2)
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt  DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deletedAt  DateTime? @map("deleted_at") @db.Timestamptz(3)
+  expense    Expense   @relation(fields: [expenseId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  person     Person    @relation(fields: [personId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  debt       Debt?
+
+  @@unique([expenseId, personId])
+  @@index([personId])
+  @@map("expense_allocations")
+}
+
+// A standalone loan is the debt itself (origin LOAN), not a duplicate obligation.
+model Debt {
+  id                  String             @id @default(uuid()) @db.Uuid
+  origin              DebtOrigin
+  expenseAllocationId String?            @unique @map("expense_allocation_id") @db.Uuid
+  debtorPersonId      String             @map("debtor_person_id") @db.Uuid
+  creditorPersonId    String             @map("creditor_person_id") @db.Uuid
+  originalAmount      Decimal            @map("original_amount") @db.Decimal(14, 2)
+  currency            Currency           @default(PEN)
+  incurredOn          DateTime           @map("incurred_on") @db.Date
+  dueOn               DateTime?          @map("due_on") @db.Date
+  description         String?            @db.Text
+  createdAt           DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt           DateTime           @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deletedAt           DateTime?          @map("deleted_at") @db.Timestamptz(3)
+  expenseAllocation   ExpenseAllocation? @relation(fields: [expenseAllocationId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  debtor              Person             @relation("DebtDebtor", fields: [debtorPersonId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  creditor            Person             @relation("DebtCreditor", fields: [creditorPersonId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  repayments          Repayment[]
+
+  @@index([debtorPersonId, deletedAt])
+  @@index([creditorPersonId, deletedAt])
+  @@index([deletedAt, dueOn])
+  @@map("debts")
+}
+
+model Repayment {
+  id          String    @id @default(uuid()) @db.Uuid
+  debtId      String    @map("debt_id") @db.Uuid
+  amount      Decimal   @db.Decimal(14, 2)
+  paidOn      DateTime  @map("paid_on") @db.Date
+  description String?   @db.Text
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  debt        Debt      @relation(fields: [debtId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@index([debtId, deletedAt])
+  @@index([deletedAt, paidOn])
+  @@map("repayments")
+}
