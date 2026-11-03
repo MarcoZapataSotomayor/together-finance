@@ -2,6 +2,8 @@
 
 ## Scope and verified result
 
+Production migration deployment now requires the archive/manifest to pass the checks in [the 1.0 production runbook](production-deployment.md), including a maximum age of 24 hours and a checksum independently recorded after a recovery drill. The runtime never receives these operator-only settings. A genuinely empty initial database needs the empty-database recovery procedure in that runbook; the existing financial restore verifier deliberately expects initialized financial tables.
+
 `backend/scripts/backup-restore.mjs` creates portable PostgreSQL custom archives and restores them only into a **freshly created disposable loopback database**. It never infers credentials from DATABASE_URL, DIRECT_URL or `.env`. There is no upload, deployment, automatic production restore, retention expiry or database reset.
 
 An actual local PostgreSQL 17 drill passed: fictional records and the existing migration were dumped/restored with real pg_dump/pg_restore. Fingerprints matched all seven financial tables, exact amounts, deletion flags, repayment history, migration metadata, foreign keys, CHECK constraints and indexes. The source was unchanged. A corrupt archive and an attempt to reuse the generated restore target were rejected. **No actual Neon backup or restore was performed.**

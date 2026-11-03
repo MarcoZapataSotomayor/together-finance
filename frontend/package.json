@@ -7,6 +7,8 @@
     "node": "24.x"
   },
   "scripts": {
+    "configure:production": "node scripts/configure-production.mjs",
+    "check:production": "node scripts/check-production-config.mjs",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",

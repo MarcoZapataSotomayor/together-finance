@@ -14,8 +14,7 @@ import { DataManagementStore } from './data-management-store.js';
 import { authTestEnvironment, testPassword } from './auth-fixture.js';
 
 // Loopback transport model, not a claim about Vercel's hosted TLS/header behavior.
-describe('staging reverse-proxy transport (no external network/database)', () => {
-  const origin = 'https://finance-staging.vercel.app';
+function proxyChecks(origin: string) {
   let app: INestApplication, proxy: Server, port: number;
   async function backend() {
     const config = validateEnvironment({
@@ -169,4 +168,12 @@ describe('staging reverse-proxy transport (no external network/database)', () =>
       .set('Cookie', session.cookie)
       .expect(401);
   });
-});
+}
+
+describe.each([
+  'https://finance-staging.vercel.app',
+  'https://finance.vercel.app',
+])(
+  'reverse-proxy transport for %s (no external network/database)',
+  proxyChecks,
+);

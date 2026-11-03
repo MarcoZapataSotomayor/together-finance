@@ -7,7 +7,7 @@ import {
 } from '../scripts/check-staging-config.mjs'
 
 const template = JSON.parse(
-  await readFile(new URL('../vercel.json', import.meta.url), 'utf8'),
+  await readFile(new URL('../../docs/deployment/vercel.staging.json', import.meta.url), 'utf8'),
 )
 const env = {
   STAGING_RENDER_ORIGIN: 'https://finance-api-staging.onrender.com',
